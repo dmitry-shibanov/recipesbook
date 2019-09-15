@@ -1,0 +1,160 @@
+import 'package:flutter/material.dart';
+
+class UserProfile extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return UserProfileState();
+  }
+}
+
+class UserProfileState extends State<UserProfile> {
+  final GlobalKey<FormState> _globalKey = GlobalKey();
+  String _login = '';
+  String _password = '';
+  bool _notifications = false;
+  bool _stayLogin = true;
+
+  Widget _buildEmailTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.emailAddress,
+      decoration: InputDecoration(
+          labelText: 'Login', filled: true, fillColor: Colors.transparent),
+      validator: (String value) {
+        if (value.isEmpty ||
+            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+                .hasMatch(value)) {
+          return 'The mail is not valid';
+        }
+      },
+      onSaved: (String text) {
+        _login = text;
+      },
+    );
+  }
+
+  Widget _buildPasswordTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.text,
+      obscureText: true,
+      decoration: InputDecoration(
+          labelText: 'password', filled: true, fillColor: Colors.transparent),
+      validator: (String value) {
+        if (value.isEmpty || value.length < 10) {
+          return 'The password should be more than 10 characters';
+        }
+      },
+      onSaved: (String text) {
+        _password = text;
+      },
+    );
+  }
+
+  void submitForm() {
+    if (!_globalKey.currentState.validate()) {
+      return;
+    }
+    _globalKey.currentState.save();
+  }
+
+  showMyDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Удалить аккаунт ?'),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Отмена'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            FlatButton(
+              child: Text('Подтвердить'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))),
+          content: Container(
+            width: 190.0,
+            height: 130.0,
+            child: Center(child: Text('Вы действительно хотите удалить аккаунт, все ваши рецепты будут удалены ?'),),
+          ),
+        );
+      });
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Container(
+        padding: EdgeInsets.all(10.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _globalKey,
+            child: Container(
+              // width: targetWidth,
+              child: Column(
+                children: <Widget>[
+                  _buildEmailTextField(),
+                  SizedBox(height: 10.0),
+                  _buildPasswordTextField(),
+                  SizedBox(height: 10.0),
+                  SwitchListTile(
+                      secondary: Icon(Icons.mail_outline),
+                      title: Text('Оповещения'),
+                      value: _notifications,
+                      onChanged: (value) {
+                        setState(() {
+                          _notifications = value;
+                        });
+                      }),
+                  SizedBox(height: 10.0),
+                  SwitchListTile(
+                      secondary: Icon(Icons.verified_user),
+                      title: Text('Оставаться в системе'),
+                      value: _stayLogin,
+                      onChanged: (value) {
+                        setState(() {
+                          _stayLogin = value;
+                        });
+                      }),
+                  SizedBox(height: 10.0),
+                  ListTile(
+                      title: Center(
+                        child: Text(
+                          'Удалить аккаунт',
+                          style: TextStyle(
+                            color: Colors.red,
+                          ),
+                        ),
+                      ),
+                      onTap: () =>showMyDialog(context)),
+                  SizedBox(height: 10.0),
+                  ButtonTheme(
+                    minWidth: MediaQuery.of(context).size.width / 2,
+                    child: RaisedButton(
+                      child: Text('Сохранить'),
+                      onPressed: submitForm,
+                      elevation: 4.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: new BorderRadius.circular(
+                            MediaQuery.of(context).size.height / 2),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
