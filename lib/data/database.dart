@@ -41,7 +41,7 @@ part 'database.g.dart';
 
 @UseMoor(tables: [Receipt, Ingredient, ReceiptSteps, User])
 class MyDatabase extends _$MyDatabase{
-  MyDatabase(QueryExecutor e) : super(FlutterQueryExecutor.inDatabaseFolder(
+  MyDatabase() : super(FlutterQueryExecutor.inDatabaseFolder(
           path: 'db.sqlite',
         ));
 
@@ -83,7 +83,7 @@ Future<List<Steps>> watchCart(int id) {
 
   Future<List<Recipes>> get allRecipes => select(receipt).get();
   Future<List<Ingredients>> get allIngredients => select(ingredient).get();
-  Future<int> insertRecipe(Recipes recipe) => into(receipt).insert(recipe); 
+  Future<int> insertRecipe(Insertable<Recipes> recipe) => into(receipt).insert(recipe); 
 }
 
 // @UseDao(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:image_gallery/image_gallery.dart';
+// import 'package:image_gallery/image_gallery.dart';
 
 class Gallery extends StatefulWidget {
   @override
@@ -20,7 +20,7 @@ class _GalleryState extends State<Gallery> {
 
   Future<void> loadImageList() async {
     Map<dynamic, dynamic> allImageTemp;
-      allImageTemp = await FlutterGallaryPlugin.getAllImages;
+      // allImageTemp = await FlutterGallaryPlugin.getAllImages;
 
 
     setState(() {

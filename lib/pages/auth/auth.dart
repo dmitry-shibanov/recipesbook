@@ -101,7 +101,13 @@ class RegesrtationState extends State<Regestration> {
       return;
     }
     _globalKey.currentState.save();
-      Navigator.pushReplacementNamed(context, '/main');
+    Navigator.pushReplacementNamed(context, '/main');
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _globalKey.currentState.dispose();
   }
 
   @override

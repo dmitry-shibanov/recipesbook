@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -7,25 +8,28 @@ import 'package:uuid/uuid.dart';
 
 class StepRecipe extends StatefulWidget {
   Function _deleteRow;
+  Function _setImage;
   int _index;
 
-  StepRecipe(this._deleteRow, this._index);
+  StepRecipe(this._deleteRow, this._index, this._setImage);
 
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
-    return StepRecipeState(_deleteRow, _index);
+    return StepRecipeState(_deleteRow, _index, _setImage);
   }
 }
 
 class StepRecipeState extends State<StepRecipe> {
   String key;
+  var focusNode = new FocusNode();
   final PermissionHandler _permissionHandler = PermissionHandler();
   var uuid;
   int _index;
   File file;
-  TextEditingController controller;
-
+  TextEditingController controller = TextEditingController();
+  Function _setImage;
+  Key _k1 = new GlobalKey();
   Future<bool> _requestPermission(PermissionGroup permission) async {
     var result = await _permissionHandler.requestPermissions([permission]);
     if (result[permission] == PermissionStatus.granted) {
@@ -36,7 +40,7 @@ class StepRecipeState extends State<StepRecipe> {
 
   Function _deleteRow;
 
-  StepRecipeState(this._deleteRow, this._index);
+  StepRecipeState(this._deleteRow, this._index, this._setImage);
 
   @override
   void initState() {
@@ -44,7 +48,7 @@ class StepRecipeState extends State<StepRecipe> {
 
     var uuid = new Uuid();
     key = uuid.v1();
-    controller = TextEditingController();
+    
   }
 
   @override
@@ -80,61 +84,82 @@ class StepRecipeState extends State<StepRecipe> {
                         // key: ValueKey(uuid.v1()),
                         icon: Icon(Icons.add),
                         alignment: Alignment.center,
-                        onPressed: () {
-                          showModalBottomSheet(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return Container(
-                                  child: Wrap(
-                                    children: <Widget>[
-                                      ListTile(
-                                        leading: Icon(Icons.photo_album,
-                                            color: Colors.red),
-                                        title: Text('Галлерея'),
-                                        onTap: () async {
-                                          if (await _requestPermission(
-                                              PermissionGroup.photos)) {
-                                            var image =
-                                                await ImagePicker.pickImage(
-                                                    source:
-                                                        ImageSource.gallery);
-                                            setState(() {
-                                              file = image;
-                                            });
-                                          }
-                                          // file = await
-                                          // images;
-                                          // Navigator.pushNamed(context, '/gallery');
-                                        },
-                                      ),
-                                      ListTile(
-                                        leading: Icon(
-                                          Icons.photo,
-                                          color: Colors.red,
-                                        ),
-                                        title: Text('Фото'),
-                                        onTap: () async {
-                                          if (await _requestPermission(
-                                              PermissionGroup.camera)) {
-                                            var image =
-                                                await ImagePicker.pickImage(
-                                                    source: ImageSource.camera);
-                                            print("from camera" +
-                                                image.toString());
-                                            print("from camera" +
-                                                file.toString());
-                                            setState(() {
-                                              file = new File(image.toString());
-                                            });
-                                            // Navigator.pushNamed(context, '/camera');
-                                          }
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              });
-                        },
+                        onPressed: ()=>_setImage(file)
+                        // () async {
+                          // var image = await ImagePicker.pickImage(
+                          //     source: ImageSource.gallery);
+                          // // var timer =
+                          // //     Timer(Duration(seconds: 7), () {
+                          // // if(this.mounted){
+                          // setState(() {
+                          //   print('sajslakslaas');
+                          //   file = image;
+                          // });
+                          // }
+
+                          // showModalBottomSheet(
+                          //     context: context,
+                          //     builder: (BuildContext context) {
+                          //       return Container(
+                          //         child: Wrap(
+                          //           children: <Widget>[
+                          //             ListTile(
+                          //               leading: Icon(Icons.photo_album,
+                          //                   color: Colors.red),
+                          //               title: Text('Галлерея'),
+                          //               onTap: () async {
+                          //                 if (await _requestPermission(
+                          //                     PermissionGroup.photos)) {
+                          //                       Navigator.pop(context);
+                          //                   var image =
+                          //                       await ImagePicker.pickImage(
+                          //                           source:
+                          //                               ImageSource.gallery);
+                          //                   // var timer =
+                          //                   //     Timer(Duration(seconds: 7), () {
+                          //                     if(this.mounted){
+                          //                     setState(() {
+                          //                       print('sajslakslaas');
+                          //                       file = image;
+                          //                     });
+                          //                     }
+
+                          //                   // });
+
+                          //                 }
+                          //                 // file = await
+                          //                 // images;
+                          //                 // Navigator.pushNamed(context, '/gallery');
+                          //               },
+                          //             ),
+                          //             ListTile(
+                          //               leading: Icon(
+                          //                 Icons.photo,
+                          //                 color: Colors.red,
+                          //               ),
+                          //               title: Text('Фото'),
+                          //               onTap: () async {
+                          //                 if (await _requestPermission(
+                          //                     PermissionGroup.camera)) {
+                          //                   var image =
+                          //                       await ImagePicker.pickImage(
+                          //                           source: ImageSource.camera);
+                          //                   print("from camera" +
+                          //                       image.toString());
+                          //                   print("from camera" +
+                          //                       file.toString());
+                          //                   setState(() {
+                          //                     file = new File(image.toString());
+                          //                   });
+                          //                   // Navigator.pushNamed(context, '/camera');
+                          //                 }
+                          //               },
+                          //             ),
+                          //           ],
+                          //         ),
+                          //       );
+                          //     });
+                        // },
                       )
                     : Image.file(
                         file,
@@ -145,13 +170,18 @@ class StepRecipeState extends State<StepRecipe> {
             Expanded(
               // key: ValueKey(uuid.v1()),
               flex: 2,
-              child: TextField(
+              child: TextFormField(
+                // focusNode: focusNode,
+                key: _k1,
                 // key: ValueKey(uuid.v1()),
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0)))),
                 onChanged: (String value) {
                   // data_step['description'] = value;
+                },
+                onTap: (){
+                  FocusScope.of(context).requestFocus(focusNode);
                 },
                 maxLines: 5,
                 // controller: controllers[index],
