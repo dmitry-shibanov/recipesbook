@@ -22,8 +22,11 @@ class SavedRecipeItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    return Card(
+    return GestureDetector(
+      onTap: (){
+        Navigator.pushNamed<bool>(context, '/product/1');
+      },
+      child: Card(
       child: Column(
         children: <Widget>[
           Image.asset('public/food.jpg'),
@@ -35,6 +38,7 @@ class SavedRecipeItem extends StatelessWidget {
           // _buildActionButtons(context)
         ],
       ),
+     ),
     );
   }
 }

@@ -20,7 +20,7 @@ class ProductCard extends StatelessWidget {
           SizedBox(
             width: 8.0,
           ),
-          PriceTag('12312')
+          //PriceTag('12312')
         ],
       ),
     );
@@ -53,7 +53,7 @@ class ProductCard extends StatelessWidget {
         children: <Widget>[
           Image.asset('public/food.jpg'),
           _buildTitlePriceRow(),
-          AddressTag('any address'),
+        //  AddressTag('any address'),
           _buildActionButtons(context)
         ],
       ),

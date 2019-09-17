@@ -147,7 +147,12 @@ class _MyHomePageState extends State<MyHomePage>
                 leading: Icon(Icons.exit_to_app),
                 title: Text('Выход'),
                 onTap: () {
-                  Navigator.pushNamed(context, '/products');
+                  Navigator.of(context)
+    .pushNamedAndRemoveUntil('/auth', (Route<dynamic> route) => false);
+    // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+    // LoginScreen()), (Route<dynamic> route) => false),
+    // Navigator.of(context).popUntil(ModalRoute.withName('/root'));
+                  // Navigator.pushNamed(context, '/products');
                 },
               ),
             ],

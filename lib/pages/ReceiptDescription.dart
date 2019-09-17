@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ProductDescription extends StatelessWidget {
-  int _index;
+  final int _index;
   ProductDescription(this._index);
-  PageController controller = PageController();
+  final PageController controller = PageController(initialPage: 0);
   var currentPageValue = 0.0;
 
   Widget buildIngredients() {
@@ -30,8 +30,10 @@ class ProductDescription extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: NestedScrollView(
+    return 
+    Scaffold(
+      body: 
+      NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
@@ -56,52 +58,62 @@ class ProductDescription extends StatelessWidget {
             ),
           ];
         },
-        body: Flex(
-          direction: Axis.vertical,
-          children: <Widget>[
-            ListView(children: <Widget>[
-              Image.asset('public/food.jpg'),
-              Text(
-                'Описание',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Container(
-                margin: EdgeInsets.all(16.0),
-                child: Text(
-                    'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!'),
-              ),
-              Text(
-                'Ингедиенты',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              buildIngredients(),
-              Text(
-                'Шаги',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-              ),
-              Expanded(
-                child: PageView.builder(
-                  controller: controller,
-                  itemBuilder: _stepReceipt,
-                  itemCount: 10,
-                ),
-              ),
-            ]),
-          ],
-        ),
+        body: 
+        // Flex(
+          // direction: Axis.vertical,
+          // children: <Widget>[
+            ListView(
+                // controller: ScrollController(keepScrollOffset: false),
+                // shrinkWrap: false,
+                children: <Widget>[
+                  Image.asset('public/food.jpg'),
+                  Text(
+                    'Описание',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  ),
+                  Container(
+                    margin: EdgeInsets.all(16.0),
+                    child: Text(
+                        'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!'),
+                  ),
+                  Text(
+                    'Ингедиенты',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  ),
+                  buildIngredients(),
+                  Text(
+                    'Шаги',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  ),
+                  Expanded(
+                    child: 
+                    PageView.builder(
+                      // controller: controller,
+                      itemBuilder: _stepReceipt,
+                      itemCount: 10,
+                      scrollDirection: Axis.horizontal,
+                    ),
+                  ),
+                ]),
+          // ],
+        // ),
       ),
     );
   }
 
   Widget _stepReceipt(BuildContext context, int index) {
     return Container(
-        margin: EdgeInsets.symmetric(vertical: 16.0),
-        child: Column(
-          children: <Widget>[
-            Image.asset('public/food.jpg'),
-            Text(
-                'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!'),
-          ],
-        ));
+      margin: EdgeInsets.symmetric(vertical: 16.0),
+      child: Column(
+        children: <Widget>[
+          Image.asset('public/food.jpg'),
+          Text(
+              'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!'),
+        ],
+      ),
+    );
   }
 }
