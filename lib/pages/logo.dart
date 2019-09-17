@@ -16,10 +16,10 @@ class LogoPageFull extends StatefulWidget {
 
 class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
   AnimationController controller;
-    AnimationController controller1;
+  AnimationController controller1;
   Animation<double> animation;
-    Animation<double> animation1;
-  List<String> data = ['1','2','3'];
+  Animation<double> animation1;
+  List<String> data = ['Десерты','Напитки', 'Кухня', '3','4','5','6','7','8','9'];
   int _currentIndex = 0;
   DecorationImage _buildBakcgroundImage() {
     return DecorationImage(
@@ -31,7 +31,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
   }
 
   @override
-  dispose(){
+  dispose() {
     controller.stop();
     controller1.stop();
     super.dispose();
@@ -40,9 +40,9 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
   initState() {
     super.initState();
     controller = AnimationController(
-        duration: const Duration(milliseconds: 4000), vsync: this);
+        duration: const Duration(milliseconds: 6000), vsync: this);
     controller1 = AnimationController(
-        duration: const Duration(milliseconds: 1000), vsync: this);
+        duration: const Duration(milliseconds: 1300), vsync: this);
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
     animation1 = CurvedAnimation(parent: controller1, curve: Curves.easeIn);
     animation.addStatusListener((status) {
@@ -59,7 +59,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
       //   controller.forward();
       // }
     });
-    animation1.addStatusListener((status){
+    animation1.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         controller1.reverse();
       } else if (status == AnimationStatus.dismissed) {
@@ -70,7 +70,8 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
       }
     });
     controller.forward();
-    controller1.forward();
+    new Future.delayed(const Duration(milliseconds: 2000),
+            () => controller1.forward());
   }
 
   @override
@@ -79,28 +80,35 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         image: _buildBakcgroundImage(),
       ),
-      child: Column(
-        children: <Widget>[
-          FadeTransition(
-            opacity: animation,
-            child: Center(
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            FadeTransition(
+              opacity: animation,
               child: Text(
                 'Recipes',
                 style: TextStyle(
                     fontFamily: 'DancingScript',
-                    fontSize: 46.0,
+                    fontSize: 76.0,
                     fontWeight: FontWeight.bold),
               ),
             ),
-          ),
-          Container(
-              alignment: Alignment.bottomCenter,
-              child: Text(
+            SizedBox(
+              height: 8.0,
+            ),
+            FadeTransition(
+              opacity: animation1,
+              child: Container(
+                  // alignment: Alignment.bottomCenter,
+                  child: Text(
                 data[_currentIndex],
                 style: TextStyle(
                     fontFamily: 'Chilanka', fontWeight: FontWeight.bold),
-              ))
-        ],
+              )),
+            )
+          ],
+        ),
       ),
     );
   }
