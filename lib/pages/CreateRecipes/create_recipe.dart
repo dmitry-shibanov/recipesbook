@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moor_flutter/moor_flutter.dart' as moor;
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -149,11 +150,16 @@ class CreateReceiptState extends State<CreateReceipt> {
             RaisedButton(
               key: timed,
               color: Colors.white,
-              onPressed: () => Navigator.push(
+              onPressed: () async {
+                var dir = await getApplicationDocumentsDirectory();
+                print(dir.path);
+                                // new Directory().create();
+                print(_steps);
+                Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => PreviewSteps(_steps),
-                  )),
+                  ));},
               // async {
               //     await _requestPermission(PermissionGroup.storage);
               //     final _db = new MyDatabase();
@@ -180,7 +186,7 @@ class CreateReceiptState extends State<CreateReceipt> {
   Widget _buildSteps(BuildContext context, int index) {
     Map<String, dynamic> data_step = {
       'content': "",
-      'image': null,
+      'image': "",
     };
     _steps.add(data_step);
     // File file = new File('/storage/emulated/0/Android/data/shibanov.recipesbook/files/Pictures/scaled_49884ac3-294b-4377-8074-0a1cf843a4c95101920437980622551.jpg');
@@ -228,7 +234,7 @@ class CreateReceiptState extends State<CreateReceipt> {
                                                 await ImagePicker.pickImage(
                                                     source:
                                                         ImageSource.gallery);
-                                            _steps[index]['image'] =
+                                            // _steps[index]['image'] =
                                                 image.toString();
                                             Navigator.pop(
                                                 context, image.toString());
@@ -263,9 +269,12 @@ class CreateReceiptState extends State<CreateReceipt> {
                                   ),
                                 );
                               });
+                              print('came');
                           setState(() {
                             print(result);
                             _steps[index]['image'] = result;
+                            // file = new File(result);
+                            file = result;
                           });
                         },
                       )

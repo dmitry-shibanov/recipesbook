@@ -43,7 +43,7 @@ class PreviewStepsState extends State<PreviewSteps> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     border: Border.all(color: Colors.black, width: 2.0)),
-                child: Image.file(item['file']),
+                child: Image.file(new File(item['image'])),
               ),
             ),
             Expanded(
