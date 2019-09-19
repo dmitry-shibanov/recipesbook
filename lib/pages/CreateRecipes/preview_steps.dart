@@ -11,6 +11,7 @@ class PreviewSteps extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
+    print(steps.length);
     return PreviewStepsState(this.steps);
   }
 }
@@ -43,7 +44,7 @@ class PreviewStepsState extends State<PreviewSteps> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     border: Border.all(color: Colors.black, width: 2.0)),
-                child: Image.file(new File(item['image'])),
+                child: Image.file(new File('/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/E119EA96-A45D-4A83-B2EB-9E4F5BF5C6A9/tmp/image_picker_A85B9803-3B26-4BE5-95B5-DF296F71BA73-84590-000053ED7230DC46.jpg')),
               ),
             ),
             Expanded(
@@ -74,27 +75,51 @@ class PreviewStepsState extends State<PreviewSteps> {
                 .map((index, item) => MapEntry(index, _buildSteps(index, item)))
                 .values
                 .toList(),
-            onReorder: (int start, int current) {
-              // dragging from top to bottom
-              if (start < current) {
-                int end = current - 1;
-                Map<String, dynamic> startItem = _steps[start];
-                int i = 0;
-                int local = start;
-                do {
-                  _steps[local] = _steps[++local];
-                  i++;
-                } while (i < end - start);
-                _steps[end] = startItem;
-              }
-              // dragging from bottom to top
-              else if (start > current) {
-                Map<String, dynamic> startItem = _steps[start];
-                for (int i = start; i > current; i--) {
-                  _steps[i] = _steps[i - 1];
-                }
-                _steps[current] = startItem;
-              }
-            }));
+            // onReorder: (int start, int current) {
+            //   // dragging from top to bottom
+            //   if (start < current) {
+            //     int end = current - 1;
+            //     Map<String, dynamic> startItem = _steps[start];
+            //     int i = 0;
+            //     int local = start;
+            //     do {
+            //       _steps[local] = _steps[++local];
+            //       i++;
+            //     } while (i < end - start);
+            //     _steps[end] = startItem;
+            //   }
+            //   // dragging from bottom to top
+            //   else if (start > current) {
+            //     Map<String, dynamic> startItem = _steps[start];
+            //     for (int i = start; i > current; i--) {
+            //       _steps[i] = _steps[i - 1];
+            //     }
+            //     _steps[current] = startItem;
+            //   }
+            // }
+             onReorder: (int start, int current) {
+        // dragging from top to bottom
+        if (start < current) {
+          int end = current - 1;
+          Map<String,dynamic> startItem = _steps[start];
+          int i = 0;
+          int local = start;
+          do {
+            _steps[local] = _steps[++local];
+            i++;
+          } while (i < end - start);
+          _steps[end] = startItem;
+        }
+        // dragging from bottom to top
+        else if (start > current) {
+          Map<String,dynamic> startItem = _steps[start];
+          for (int i = start; i > current; i--) {
+            _steps[i] = _steps[i - 1];
+          }
+          _steps[current] = startItem;
+        }
+        setState(() {});
+      },
+            ));
   }
 }

@@ -24,7 +24,9 @@ class CreateReceipt extends StatefulWidget {
 
 class CreateReceiptState extends State<CreateReceipt> {
   final List<TextEditingController> controllers = [];
-  final List<File> images = [];
+  final List<String> images = [];
+  final List<File> imagesFiles = [];
+
   final List<String> keys = [];
   final List<Map<String, dynamic>> _steps = [];
   final Map<String, String> _general_desc = {
@@ -37,7 +39,7 @@ class CreateReceiptState extends State<CreateReceipt> {
   static final _formKey = new GlobalKey<FormState>();
   TimeOfDay _timeOfDay;
   final PermissionHandler _permissionHandler = PermissionHandler();
-
+  bool tapped = false;
   @override
   void initState() {
     super.initState();
@@ -55,10 +57,13 @@ class CreateReceiptState extends State<CreateReceipt> {
     return false;
   }
 
-  void _setImage(File f) async {
-    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+  void _setImage(File path, int index) {
+    print(path);
+    print("it is our path ${path.toString().replaceFirst('File: ', '')}");
     setState(() {
-      f = image;
+      images[index] = path.toString();
+      imagesFiles[index] = path;
+      _steps[index]['image'] = path;
     });
   }
 
@@ -68,6 +73,9 @@ class CreateReceiptState extends State<CreateReceipt> {
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
+        setState(() {
+          tapped = false;
+        });
       },
       child: SingleChildScrollView(
         child: Column(
@@ -111,7 +119,14 @@ class CreateReceiptState extends State<CreateReceipt> {
                       child: Icon(Icons.add),
                       onTap: () {
                         setState(() {
+                          Map<String, dynamic> data_step = {
+                            'content': "",
+                            'image': null,
+                          };
+                          _steps.add(data_step);
                           controllers.add(new TextEditingController());
+                          images.add("");
+                          imagesFiles.add(null);
                           var uuid =
                               new Uuid(options: {'grng': UuidUtil.cryptoRNG});
                           keys.add(uuid.v1());
@@ -147,19 +162,25 @@ class CreateReceiptState extends State<CreateReceipt> {
               itemBuilder: _buildSteps,
               itemCount: keys.length,
             ),
+            tapped
+                ? SizedBox(
+                    height: 36.0,
+                  )
+                : null,
             RaisedButton(
               key: timed,
               color: Colors.white,
               onPressed: () async {
                 var dir = await getApplicationDocumentsDirectory();
                 print(dir.path);
-                                // new Directory().create();
+                // new Directory().create();
                 print(_steps);
                 Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PreviewSteps(_steps),
-                  ));},
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PreviewSteps(_steps),
+                    ));
+              },
               // async {
               //     await _requestPermission(PermissionGroup.storage);
               //     final _db = new MyDatabase();
@@ -184,11 +205,7 @@ class CreateReceiptState extends State<CreateReceipt> {
   }
 
   Widget _buildSteps(BuildContext context, int index) {
-    Map<String, dynamic> data_step = {
-      'content': "",
-      'image': "",
-    };
-    _steps.add(data_step);
+    String result = "";
     // File file = new File('/storage/emulated/0/Android/data/shibanov.recipesbook/files/Pictures/scaled_49884ac3-294b-4377-8074-0a1cf843a4c95101920437980622551.jpg');
     File file;
     return Dismissible(
@@ -212,12 +229,12 @@ class CreateReceiptState extends State<CreateReceipt> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     border: Border.all(color: Colors.black, width: 2.0)),
-                child: file == null
+                child: images[index] == ""
                     ? IconButton(
                         icon: Icon(Icons.add),
                         alignment: Alignment.center,
                         onPressed: () async {
-                          var result = await showModalBottomSheet(
+                          var files = await showModalBottomSheet(
                               context: context,
                               builder: (BuildContext context) {
                                 return Container(
@@ -235,9 +252,7 @@ class CreateReceiptState extends State<CreateReceipt> {
                                                     source:
                                                         ImageSource.gallery);
                                             // _steps[index]['image'] =
-                                                image.toString();
-                                            Navigator.pop(
-                                                context, image.toString());
+                                            Navigator.pop(context, image);
                                           }
                                         },
                                       ),
@@ -269,16 +284,18 @@ class CreateReceiptState extends State<CreateReceipt> {
                                   ),
                                 );
                               });
-                              print('came');
-                          setState(() {
-                            print(result);
-                            _steps[index]['image'] = result;
-                            // file = new File(result);
-                            file = result;
-                          });
+                          print('came');
+                          Future.delayed(Duration(milliseconds: 2000),
+                              () => _setImage(files, index));
+                          // setState(() {
+                          // print(result);
+                          // _setImage(result, index);
+                          // file = new File(result);
+                          // file = result;
+                          // });
                         },
                       )
-                    : Image.file(file),
+                    : Image.file(imagesFiles[index]),
               ),
             ),
             Expanded(
@@ -290,6 +307,11 @@ class CreateReceiptState extends State<CreateReceipt> {
                 onChanged: (String value) {
                   // data_step['description'] = value;
                   _steps[index]['content'] = value;
+                },
+                onTap: () {
+                  setState(() {
+                    tapped = true;
+                  });
                 },
                 maxLines: 5,
               ),
