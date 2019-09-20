@@ -162,11 +162,10 @@ class CreateReceiptState extends State<CreateReceipt> {
               itemBuilder: _buildSteps,
               itemCount: keys.length,
             ),
-            tapped
-                ? SizedBox(
-                    height: 36.0,
-                  )
-                : null,
+            
+                SizedBox(
+                    height: tapped?MediaQuery.of(context).size.height/2:0,
+                  ),
             RaisedButton(
               key: timed,
               color: Colors.white,
