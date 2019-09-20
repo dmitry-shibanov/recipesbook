@@ -162,10 +162,9 @@ class CreateReceiptState extends State<CreateReceipt> {
               itemBuilder: _buildSteps,
               itemCount: keys.length,
             ),
-            
-                SizedBox(
-                    height: tapped?MediaQuery.of(context).size.height/2:0,
-                  ),
+            SizedBox(
+              height: tapped ? MediaQuery.of(context).size.height / 2 : 0,
+            ),
             RaisedButton(
               key: timed,
               color: Colors.white,
@@ -174,11 +173,40 @@ class CreateReceiptState extends State<CreateReceipt> {
                 print(dir.path);
                 // new Directory().create();
                 print(_steps);
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PreviewSteps(_steps),
-                    ));
+                await _requestPermission(PermissionGroup.storage);
+                final _db = new MyDatabase();
+                ReceiptCompanion companion = new ReceiptCompanion(
+                    content: moor.Value('какое-то блюдо'),
+                    title: moor.Value('Попытка 1'),
+                    ingredients: moor.Value(1));
+                var o = await _db.insertRecipe(companion);
+                ReceiptStepsCompanion stepsCompanion = new ReceiptStepsCompanion(
+                    description: moor.Value('descrption 1'),
+                    image: moor.Value(
+                        '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/24768A4C-E316-4097-B215-5D73F0B30E64/tmp/image_picker_4EA6FCD9-F60E-4F34-97F0-D59ABA43CA6F-33257-00000ED15597B726.jpg'),
+                    recipe_asoc: moor.Value(o));
+                ReceiptStepsCompanion stepsCompanion1 = new ReceiptStepsCompanion(
+                    description: moor.Value('descrption 2'),
+                    image: moor.Value(
+                        '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/24768A4C-E316-4097-B215-5D73F0B30E64/tmp/image_picker_4EA6FCD9-F60E-4F34-97F0-D59ABA43CA6F-33257-00000ED15597B726.jpg'),
+                    recipe_asoc: moor.Value(o));
+                ReceiptStepsCompanion stepsCompanion2 = new ReceiptStepsCompanion(
+                    description: moor.Value('descrption 3'),
+                    image: moor.Value(
+                        '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/24768A4C-E316-4097-B215-5D73F0B30E64/tmp/image_picker_4EA6FCD9-F60E-4F34-97F0-D59ABA43CA6F-33257-00000ED15597B726.jpg'),
+                    recipe_asoc: moor.Value(o));
+                var res = await _db.insertSteps(stepsCompanion);
+                print(res);
+                res = await _db.insertSteps(stepsCompanion1);
+                print(res);
+                res = await _db.insertSteps(stepsCompanion2);
+                print(res);
+
+                // Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (context) => PreviewSteps(_steps),
+                //     ));
               },
               // async {
               //     await _requestPermission(PermissionGroup.storage);

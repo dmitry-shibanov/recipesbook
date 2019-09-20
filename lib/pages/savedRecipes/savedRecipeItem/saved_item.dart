@@ -1,7 +1,14 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:recipesbook/components/title_default.dart';
 
 class SavedRecipeItem extends StatelessWidget {
+  final String _image;
+  final String _title;
+
+  SavedRecipeItem(this._image,this._title);
+
   Widget _buildTitlePriceRow() {
     return Container(
       padding: EdgeInsets.only(top: 10.0),
@@ -29,7 +36,7 @@ class SavedRecipeItem extends StatelessWidget {
       child: Card(
       child: Column(
         children: <Widget>[
-          Image.asset('public/food.jpg'),
+          Image.file(new File(_image)),
           _buildTitlePriceRow(),
           SizedBox(
             height: 16.0,

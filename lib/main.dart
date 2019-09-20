@@ -11,6 +11,8 @@ import 'package:recipesbook/pages/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/pages/user_profile.dart';
 
+import 'data/database.dart';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -26,17 +28,27 @@ class MyApp extends StatelessWidget {
           buttonColor: Colors.deepPurple),
       onUnknownRoute: (RouteSettings settings) {
         return MaterialPageRoute(
-            builder: (BuildContext context) =>
-                MyHomePage(title: 'Recipes'));
+            builder: (BuildContext context) => MyHomePage(title: 'Recipes'));
       },
       routes: {
         '/': (BuildContext context) => LogoPage(),
         '/auth': (BuildContext context) => AuthPage(),
-        '/main': (BuildContext context) =>
-            MyHomePage(title: 'Recipes'),
+        '/main': (BuildContext context) => MyHomePage(title: 'Recipes'),
         '/settings': (BuildContext context) => SettingsPage(),
         '/out': (BuildContext context) => null,
-        '/saved': (BuildContext context) => SavedRecipes(),
+        '/saved': (BuildContext context) {
+          final _db = new MyDatabase();
+          List<Steps> steps;
+          //  _db.watchCart(id)
+          List<Recipes> all;
+          _db.allRecipes.then((recipes) {
+            all = recipes;
+            _db.watchCart(all[all.length - 1].id).then((step) {
+              steps = step;
+              return SavedRecipes(all, steps);
+            });
+          });
+        },
         '/favorite': (BuildContext context) => null,
         '/gallery': (BuildContext context) => Gallery(),
         '/camera': (BuildContext context) => MyCamera()
@@ -147,11 +159,11 @@ class _MyHomePageState extends State<MyHomePage>
                 leading: Icon(Icons.exit_to_app),
                 title: Text('Выход'),
                 onTap: () {
-                  Navigator.of(context)
-    .pushNamedAndRemoveUntil('/auth', (Route<dynamic> route) => false);
-    // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
-    // LoginScreen()), (Route<dynamic> route) => false),
-    // Navigator.of(context).popUntil(ModalRoute.withName('/root'));
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/auth', (Route<dynamic> route) => false);
+                  // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>
+                  // LoginScreen()), (Route<dynamic> route) => false),
+                  // Navigator.of(context).popUntil(ModalRoute.withName('/root'));
                   // Navigator.pushNamed(context, '/products');
                 },
               ),

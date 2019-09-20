@@ -9,6 +9,7 @@ class Receipt extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text().withLength(min: 6, max: 17)();
   TextColumn get content => text().named('body')();
+  TextColumn get image => text()();
   IntColumn get ingredients => integer().nullable()();
   IntColumn get steps => integer().nullable()();
 }

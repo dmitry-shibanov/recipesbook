@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class LogoPage extends StatelessWidget {
@@ -16,10 +18,16 @@ class LogoPageFull extends StatefulWidget {
 
 class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
   AnimationController controller;
-  AnimationController controller1;
+  AnimationController controllerPhrases;
   Animation<double> animation;
-  Animation<double> animation1;
-  List<String> data = ['Десерты','Напитки', 'Кухня', '3','4','5','6','7','8','9'];
+  Animation<double> animationPhrases;
+  List<String> data = [
+    'Десерты',
+    'Напитки',
+    'Кухня',
+    'Рецепты',
+    'Закуски'
+  ];
   int _currentIndex = 0;
   DecorationImage _buildBakcgroundImage() {
     return DecorationImage(
@@ -33,7 +41,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
   @override
   dispose() {
     controller.stop();
-    controller1.stop();
+    controllerPhrases.stop();
     super.dispose();
   }
 
@@ -41,10 +49,11 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
     super.initState();
     controller = AnimationController(
         duration: const Duration(milliseconds: 6000), vsync: this);
-    controller1 = AnimationController(
+    controllerPhrases = AnimationController(
         duration: const Duration(milliseconds: 1300), vsync: this);
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
-    animation1 = CurvedAnimation(parent: controller1, curve: Curves.easeIn);
+    animationPhrases =
+        CurvedAnimation(parent: controllerPhrases, curve: Curves.easeIn);
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         var future = new Future.delayed(const Duration(milliseconds: 1000),
@@ -59,19 +68,21 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
       //   controller.forward();
       // }
     });
-    animation1.addStatusListener((status) {
+    controllerPhrases.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        controller1.reverse();
+        controllerPhrases.reverse();
       } else if (status == AnimationStatus.dismissed) {
+        var random = Random();
+        
         setState(() {
-          _currentIndex++;
+          _currentIndex = random.nextInt(data.length);
         });
-        controller1.forward();
+        controllerPhrases.forward();
       }
     });
     controller.forward();
-    new Future.delayed(const Duration(milliseconds: 2000),
-            () => controller1.forward());
+    new Future.delayed(
+        const Duration(milliseconds: 2000), () => controllerPhrases.forward());
   }
 
   @override
@@ -98,7 +109,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
               height: 8.0,
             ),
             FadeTransition(
-              opacity: animation1,
+              opacity: animationPhrases,
               child: Container(
                   // alignment: Alignment.bottomCenter,
                   child: Text(

@@ -18,8 +18,19 @@ class PreviewSteps extends StatefulWidget {
 
 class PreviewStepsState extends State<PreviewSteps> {
   List<Map<String, dynamic>> _steps;
+  List<Widget> _steps_widget;
 
   PreviewStepsState(this._steps);
+
+    @override
+  void initState() {
+    _steps_widget = _steps
+                .asMap()
+                .map((index, item) => MapEntry(index, _buildSteps(index, item)))
+                .values
+                .toList();
+    super.initState();
+  }
 
   Widget _buildSteps(index, item) {
     var uuid = new Uuid(options: {'grng': UuidUtil.cryptoRNG});
@@ -65,16 +76,17 @@ class PreviewStepsState extends State<PreviewSteps> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> l = _steps
+                .asMap()
+                .map((index, item) => MapEntry(index, _buildSteps(index, item)))
+                .values
+                .toList();
     return Scaffold(
         appBar: AppBar(
           title: Text('Шаги рецепта'),
         ),
         body: ReorderableListView(
-            children: _steps
-                .asMap()
-                .map((index, item) => MapEntry(index, _buildSteps(index, item)))
-                .values
-                .toList(),
+            children: l,
             // onReorder: (int start, int current) {
             //   // dragging from top to bottom
             //   if (start < current) {

@@ -49,13 +49,15 @@ class MyDatabase extends _$MyDatabase{
   // TODO: implement schemaVersion
   int get schemaVersion => 1;
 
-Future<List<Steps>> watchCart(int id) {
+Future<List<Steps>> watchCart(int id) async {
   // load information about the cart
   // final cartQuery = select(receipt)..where((cart) => cart.id.equals(id));
 
   // and also load information about the entries in this cart
   final recipeSteps = select(receiptSteps)..where((item) => item.recipe_asoc.equals(id));
-  
+  print(recipeSteps);
+  print(recipeSteps.get());
+  var inf = await recipeSteps.get();
   return recipeSteps.get();
   // final contentQuery = select(shoppingCartEntries).join(
   //   [
@@ -83,7 +85,8 @@ Future<List<Steps>> watchCart(int id) {
 
   Future<List<Recipes>> get allRecipes => select(receipt).get();
   Future<List<Ingredients>> get allIngredients => select(ingredient).get();
-  Future<int> insertRecipe(Insertable<Recipes> recipe) => into(receipt).insert(recipe); 
+  Future<int> insertRecipe(Insertable<Recipes> recipe) => into(receipt).insert(recipe);
+  Future<int> insertSteps(Insertable<Steps> steps) => into(receiptSteps).insert(steps);
 }
 
 // @UseDao(
