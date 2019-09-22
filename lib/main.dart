@@ -6,12 +6,11 @@ import 'package:recipesbook/pages/ReceiptDescription.dart';
 import 'package:recipesbook/pages/auth/auth.dart';
 import 'package:recipesbook/pages/logo.dart';
 import 'package:recipesbook/pages/products.dart';
-import 'package:recipesbook/pages/savedRecipes/saved_resipes.dart';
 import 'package:recipesbook/pages/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/pages/user_profile.dart';
 
-import 'data/database.dart';
+import 'helpers/custom_route.dart';
 
 void main() => runApp(MyApp());
 
@@ -36,19 +35,19 @@ class MyApp extends StatelessWidget {
         '/main': (BuildContext context) => MyHomePage(title: 'Recipes'),
         '/settings': (BuildContext context) => SettingsPage(),
         '/out': (BuildContext context) => null,
-        '/saved': (BuildContext context) {
-          final _db = new MyDatabase();
-          List<Steps> steps;
-          //  _db.watchCart(id)
-          List<Recipes> all;
-          _db.allRecipes.then((recipes) {
-            all = recipes;
-            _db.watchCart(all[all.length - 1].id).then((step) {
-              steps = step;
-              return SavedRecipes(all, steps);
-            });
-          });
-        },
+        // '/saved': (BuildContext context) {
+        //   final _db = new MyDatabase();
+        //   List<Steps> steps;
+        //   //  _db.watchCart(id)
+        //   List<Recipes> all;
+        //   _db.allRecipes.then((recipes) {
+        //     all = recipes;
+        //     _db.watchCart(all[all.length - 1].id).then((step) {
+        //       steps = step;
+        //       return SavedRecipes(all, steps);
+        //     });
+        //   });
+        // },
         '/favorite': (BuildContext context) => null,
         '/gallery': (BuildContext context) => Gallery(),
         '/camera': (BuildContext context) => MyCamera()
@@ -60,7 +59,7 @@ class MyApp extends StatelessWidget {
         }
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
-          return MaterialPageRoute<bool>(
+          return CustomRoute<bool>(
               builder: (BuildContext context) => ProductDescription(index));
         }
         return null;

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:recipesbook/services/api.dart';
 
 class LogoPage extends StatelessWidget {
   @override
@@ -21,13 +22,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
   AnimationController controllerPhrases;
   Animation<double> animation;
   Animation<double> animationPhrases;
-  List<String> data = [
-    'Десерты',
-    'Напитки',
-    'Кухня',
-    'Рецепты',
-    'Закуски'
-  ];
+  List<String> data = ['Десерты', 'Напитки', 'Кухня', 'Рецепты', 'Закуски'];
   int _currentIndex = 0;
   DecorationImage _buildBakcgroundImage() {
     return DecorationImage(
@@ -56,8 +51,10 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
         CurvedAnimation(parent: controllerPhrases, curve: Curves.easeIn);
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        var future = new Future.delayed(const Duration(milliseconds: 1000),
-            () => Navigator.pushReplacementNamed(context, '/auth'));
+        var future = new Future.delayed(const Duration(milliseconds: 1000), () {
+          // Api.signOutAnon();
+          Navigator.pushReplacementNamed(context, '/auth');
+        });
         // var subscription = future.asStream().listen(doStuffCallback);
         // subscription.cancel();
 
@@ -73,7 +70,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
         controllerPhrases.reverse();
       } else if (status == AnimationStatus.dismissed) {
         var random = Random();
-        
+
         setState(() {
           _currentIndex = random.nextInt(data.length);
         });

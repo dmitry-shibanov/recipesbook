@@ -1,14 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:recipesbook/components/address.dart';
 import 'package:recipesbook/components/price_tag.dart';
 import 'package:recipesbook/components/title_default.dart';
+import 'package:recipesbook/models/recipes.dart';
 
 class ProductCard extends StatelessWidget {
   // final Product product;
-  // final int productIndex;
+  final Recipes _recipe;
 
-  // ProductCard(this.product, this.productIndex);
+  ProductCard(this._recipe);
 
   Widget _buildTitlePriceRow() {
     return Container(
@@ -33,14 +33,12 @@ class ProductCard extends StatelessWidget {
         IconButton(
           icon: Icon(Icons.info),
           color: Theme.of(context).accentColor,
-          onPressed: () =>
-              Navigator.pushNamed<bool>(context, '/product/1'),
+          onPressed: () => Navigator.pushNamed<bool>(context, '/product/1'),
         ),
         IconButton(
           icon: Icon(Icons.favorite_border),
           color: Colors.red,
-          onPressed: () =>
-              Navigator.pushNamed<bool>(context, '/product/1'),
+          onPressed: () => Navigator.pushNamed<bool>(context, '/product/1'),
         )
       ],
     );
@@ -51,9 +49,19 @@ class ProductCard extends StatelessWidget {
     return Card(
       child: Column(
         children: <Widget>[
-          Image.asset('public/food.jpg'),
+          Hero(
+            tag: 'image_hero${_recipe.documentId}',
+            child: Padding(
+              padding: EdgeInsets.all(16.0),
+              child: FadeInImage(
+                image: AssetImage('public/food.jpg'),
+                placeholder: AssetImage('public/food.jpg'),
+              ),
+            ),
+          ),
+          // Image.asset('public/food.jpg'),
           _buildTitlePriceRow(),
-        //  AddressTag('any address'),
+          //  AddressTag('any address'),
           _buildActionButtons(context)
         ],
       ),

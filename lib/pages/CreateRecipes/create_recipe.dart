@@ -4,7 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:recipesbook/models/Receipt.dart';
+// import 'package:recipesbook/models/Receipt.dart';
 import 'package:recipesbook/pages/CreateRecipes/preview_steps.dart';
 import 'dart:convert';
 import 'dart:io';
@@ -12,8 +12,6 @@ import 'package:uuid/uuid.dart';
 
 import 'package:recipesbook/pages/CreateRecipes/stepItem/step_recipe.dart';
 import 'package:uuid/uuid_util.dart';
-
-import '../../data/database.dart';
 
 class CreateReceipt extends StatefulWidget {
   @override
@@ -40,6 +38,8 @@ class CreateReceiptState extends State<CreateReceipt> {
   TimeOfDay _timeOfDay;
   final PermissionHandler _permissionHandler = PermissionHandler();
   bool tapped = false;
+  final GlobalKey<FormState> _globalKey = GlobalKey();
+
   @override
   void initState() {
     super.initState();
@@ -67,6 +67,31 @@ class CreateReceiptState extends State<CreateReceipt> {
     });
   }
 
+  Widget _buildPasswordTextField() {
+    return TextFormField(
+      keyboardType: TextInputType.text,
+      obscureText: true,
+      decoration: InputDecoration(
+          labelText: 'password', filled: true, fillColor: Colors.white),
+      validator: (String value) {
+        if (value.isEmpty || value.length < 10) {
+          return 'The password should be more than 10 characters';
+        }
+      },
+      onSaved: (String text) {
+        // _password = text;
+      },
+    );
+  }
+
+  submitForm() async {
+    if (!_globalKey.currentState.validate()) {
+      return;
+    }
+    _globalKey.currentState.save();
+    // Navigator.pushReplacementNamed(context, '/main');
+  }
+
   @override
   Widget build(BuildContext context) {
     GlobalKey timed = GlobalKey();
@@ -78,154 +103,130 @@ class CreateReceiptState extends State<CreateReceipt> {
         });
       },
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            _CreateRow('Введите заголовок', _general_desc['title']),
-            Divider(),
-            _CreateRow('Введите описание', _general_desc['decription'], 5),
-            Divider(),
-            _CreateRow('Введите ингредиенты', _general_desc['ingredients']),
-            Divider(),
-            GestureDetector(
-                child: Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Text('Время приготовления $_timeOfDay')),
-                onTap: selectTime),
-            Divider(),
-            Padding(
-              padding: EdgeInsets.all(10.0),
-              child: Row(
-                children: <Widget>[
-                  Text('Введите шаги: '),
-                  Container(
-                    padding: EdgeInsets.only(right: 80.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
+        child: Form(
+          key: _globalKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _CreateRow('Введите заголовок', _general_desc['title']),
+              Divider(),
+              _CreateRow('Введите описание', _general_desc['decription'], 5),
+              Divider(),
+              _CreateRow('Введите ингредиенты', _general_desc['ingredients']),
+              Divider(),
+              GestureDetector(
+                  child: Padding(
+                      padding: EdgeInsets.all(10.0),
+                      child: Text('Время приготовления $_timeOfDay')),
+                  onTap: selectTime),
+              Divider(),
+              Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Row(
+                  children: <Widget>[
+                    Text('Введите шаги: '),
+                    Container(
+                      padding: EdgeInsets.only(right: 80.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(10.0),
+                            topLeft: Radius.circular(10.0)),
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
                           bottomLeft: Radius.circular(10.0),
-                          topLeft: Radius.circular(10.0)),
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.centerRight,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(10.0),
-                        topLeft: Radius.circular(10.0),
+                          topLeft: Radius.circular(10.0),
+                        ),
+                        border: Border.all(width: 1.0, color: Colors.black),
                       ),
-                      border: Border.all(width: 1.0, color: Colors.black),
-                    ),
-                    child: InkWell(
-                      child: Icon(Icons.add),
-                      onTap: () {
-                        setState(() {
-                          Map<String, dynamic> data_step = {
-                            'content': "",
-                            'image': null,
-                          };
-                          _steps.add(data_step);
-                          controllers.add(new TextEditingController());
-                          images.add("");
-                          imagesFiles.add(null);
-                          var uuid =
-                              new Uuid(options: {'grng': UuidUtil.cryptoRNG});
-                          keys.add(uuid.v1());
-                        });
-                      },
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        bottomRight: Radius.circular(10.0),
-                        topRight: Radius.circular(10.0),
+                      child: InkWell(
+                        child: Icon(Icons.add),
+                        onTap: () {
+                          setState(() {
+                            Map<String, dynamic> data_step = {
+                              'content': "",
+                              'image': null,
+                            };
+                            _steps.add(data_step);
+                            controllers.add(new TextEditingController());
+                            images.add("");
+                            imagesFiles.add(null);
+                            var uuid =
+                                new Uuid(options: {'grng': UuidUtil.cryptoRNG});
+                            keys.add(uuid.v1());
+                          });
+                        },
                       ),
-                      border: Border.all(width: 1.0, color: Colors.black),
                     ),
-                    child: InkWell(
-                      child: Icon(Icons.remove),
-                      onTap: () {
-                        setState(() {
-                          _steps.removeLast();
-                          keys.removeLast();
-                          controllers.removeLast();
-                        });
-                      },
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                          bottomRight: Radius.circular(10.0),
+                          topRight: Radius.circular(10.0),
+                        ),
+                        border: Border.all(width: 1.0, color: Colors.black),
+                      ),
+                      child: InkWell(
+                        child: Icon(Icons.remove),
+                        onTap: () {
+                          setState(() {
+                            _steps.removeLast();
+                            keys.removeLast();
+                            controllers.removeLast();
+                          });
+                        },
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            ListView.builder(
-              controller: ScrollController(keepScrollOffset: false),
-              shrinkWrap: true,
-              itemBuilder: _buildSteps,
-              itemCount: keys.length,
-            ),
-            SizedBox(
-              height: tapped ? MediaQuery.of(context).size.height / 2 : 0,
-            ),
-            RaisedButton(
-              key: timed,
-              color: Colors.white,
-              onPressed: () async {
-                var dir = await getApplicationDocumentsDirectory();
-                print(dir.path);
-                // new Directory().create();
-                print(_steps);
-                await _requestPermission(PermissionGroup.storage);
-                final _db = new MyDatabase();
-                ReceiptCompanion companion = new ReceiptCompanion(
-                    content: moor.Value('какое-то блюдо'),
-                    title: moor.Value('Попытка 1'),
-                    ingredients: moor.Value(1));
-                var o = await _db.insertRecipe(companion);
-                ReceiptStepsCompanion stepsCompanion = new ReceiptStepsCompanion(
-                    description: moor.Value('descrption 1'),
-                    image: moor.Value(
-                        '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/24768A4C-E316-4097-B215-5D73F0B30E64/tmp/image_picker_4EA6FCD9-F60E-4F34-97F0-D59ABA43CA6F-33257-00000ED15597B726.jpg'),
-                    recipe_asoc: moor.Value(o));
-                ReceiptStepsCompanion stepsCompanion1 = new ReceiptStepsCompanion(
-                    description: moor.Value('descrption 2'),
-                    image: moor.Value(
-                        '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/24768A4C-E316-4097-B215-5D73F0B30E64/tmp/image_picker_4EA6FCD9-F60E-4F34-97F0-D59ABA43CA6F-33257-00000ED15597B726.jpg'),
-                    recipe_asoc: moor.Value(o));
-                ReceiptStepsCompanion stepsCompanion2 = new ReceiptStepsCompanion(
-                    description: moor.Value('descrption 3'),
-                    image: moor.Value(
-                        '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/24768A4C-E316-4097-B215-5D73F0B30E64/tmp/image_picker_4EA6FCD9-F60E-4F34-97F0-D59ABA43CA6F-33257-00000ED15597B726.jpg'),
-                    recipe_asoc: moor.Value(o));
-                var res = await _db.insertSteps(stepsCompanion);
-                print(res);
-                res = await _db.insertSteps(stepsCompanion1);
-                print(res);
-                res = await _db.insertSteps(stepsCompanion2);
-                print(res);
-
-                // Navigator.push(
-                //     context,
-                //     MaterialPageRoute(
-                //       builder: (context) => PreviewSteps(_steps),
-                //     ));
-              },
-              // async {
-              //     await _requestPermission(PermissionGroup.storage);
-              //     final _db = new MyDatabase();
-              //     // Recipes receipt = new Recipes(content: 'sklaklsalksa',title: 'try create');
-              //     ReceiptCompanion companion = new ReceiptCompanion(content: moor.Value('sklaklsalksa'),title: moor.Value('Tanother time'));
-              //                       var o = await _db.insertRecipe(companion);
-              //     print(o);
-              //     var all = await _db.allRecipes;
-              //     print(all[all.length-1].title);
-
-              // },
-              child: Text('Создать рецепт'),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(
-                    MediaQuery.of(this.context).size.height / 2)),
+              ListView.builder(
+                controller: ScrollController(keepScrollOffset: false),
+                shrinkWrap: true,
+                itemBuilder: _buildSteps,
+                itemCount: keys.length,
               ),
-            ),
-          ],
+              SizedBox(
+                height: tapped ? MediaQuery.of(context).size.height / 2 : 0,
+              ),
+              RaisedButton(
+                key: timed,
+                color: Colors.white,
+                onPressed: () async {
+                  var dir = await getApplicationDocumentsDirectory();
+                  print(dir.path);
+                  // new Directory().create();
+                  print(_steps);
+                  await _requestPermission(PermissionGroup.storage);
+
+                  // Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (context) => PreviewSteps(_steps),
+                  //     ));
+                },
+                // async {
+                //     await _requestPermission(PermissionGroup.storage);
+                //     final _db = new MyDatabase();
+                //     // Recipes receipt = new Recipes(content: 'sklaklsalksa',title: 'try create');
+                //     ReceiptCompanion companion = new ReceiptCompanion(content: moor.Value('sklaklsalksa'),title: moor.Value('Tanother time'));
+                //                       var o = await _db.insertRecipe(companion);
+                //     print(o);
+                //     var all = await _db.allRecipes;
+                //     print(all[all.length-1].title);
+
+                // },
+                child: Text('Создать рецепт'),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(
+                      MediaQuery.of(this.context).size.height / 2)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

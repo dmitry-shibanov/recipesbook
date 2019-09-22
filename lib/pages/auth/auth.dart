@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:recipesbook/services/api.dart';
+
+enum AuthMode { SignUp, Login }
 
 class AuthPage extends StatelessWidget {
   @override
@@ -19,12 +23,24 @@ class Regestration extends StatefulWidget {
   }
 }
 
-class RegesrtationState extends State<Regestration> {
+class RegesrtationState extends State<Regestration>
+    with TickerProviderStateMixin {
   String _login = '';
   String _password = '';
   bool _acceptTerms = true;
   final GlobalKey<FormState> _globalKey = GlobalKey();
   final PermissionHandler _permissionHandler = PermissionHandler();
+  AnimationController _controller;
+  AuthMode authVariant;
+  Animation<Offset> _animation;
+
+  void initState() {
+    _controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    authVariant = AuthMode.Login;
+    _animation = new Tween<Offset>(begin: Offset(0.0,-2.0),end: Offset.zero).animate(CurvedAnimation(parent:_controller,curve: Curves.fastOutSlowIn));
+    super.initState();
+  }
 
   DecorationImage _buildBakcgroundImage() {
     return DecorationImage(
@@ -84,6 +100,31 @@ class RegesrtationState extends State<Regestration> {
     );
   }
 
+  Widget _buildConfirmPasswordTextField() {
+    return FadeTransition(
+      opacity: CurvedAnimation(curve: Curves.easeIn, parent: _controller),
+      child: SlideTransition(
+        position: _animation,
+        child: TextFormField(
+        keyboardType: TextInputType.text,
+        obscureText: true,
+        decoration: InputDecoration(
+            labelText: 'Confirm password',
+            filled: true,
+            fillColor: Colors.white),
+        validator: (String value) {
+          if (value != _password && authVariant == AuthMode.SignUp) {
+            return 'Passwords should be equal';
+          }
+        },
+        onSaved: (String text) {
+          // _password = text;
+        },
+      ),
+      ),
+    );
+  }
+
   Widget _buildAcceptSwitch() {
     return SwitchListTile(
       onChanged: (bool value) {
@@ -101,6 +142,10 @@ class RegesrtationState extends State<Regestration> {
       return;
     }
     _globalKey.currentState.save();
+    // List<DocumentSnapshot> d =await Api.getRecipes();
+    // print(d);
+    // DocumentSnapshot d1 = await Api.getSteps(d[0].data['steps'].path);
+    // print(d1);
     Navigator.pushReplacementNamed(context, '/main');
   }
 
@@ -135,7 +180,27 @@ class RegesrtationState extends State<Regestration> {
                     _buildEmailTextField(),
                     SizedBox(height: 10.0),
                     _buildPasswordTextField(),
+                    SizedBox(height: 10.0),
+                    _buildConfirmPasswordTextField(),
                     _buildAcceptSwitch(),
+                    SizedBox(height: 10.0),
+                    FlatButton(
+                      child: Text(
+                          'Перейти к ${AuthMode.Login == authVariant ? 'Регистрации' : 'Входу'}'),
+                      onPressed: () {
+                        if (authVariant == AuthMode.Login) {
+                          setState(() {
+                            authVariant = AuthMode.SignUp;
+                          });
+                          _controller.forward();
+                        } else {
+                          setState(() {
+                            authVariant = AuthMode.Login;
+                          });
+                          _controller.reverse();
+                        }
+                      },
+                    ),
                     SizedBox(height: 10.0),
                     RaisedButton(
                       child: Text('finish'),

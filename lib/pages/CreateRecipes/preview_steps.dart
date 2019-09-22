@@ -6,7 +6,7 @@ import 'package:uuid/uuid_util.dart';
 
 class PreviewSteps extends StatefulWidget {
   List<Map<String, dynamic>> steps;
-  Map<String,dynamic> content;
+  Map<String, dynamic> content;
   PreviewSteps(this.steps);
 
   @override
@@ -20,15 +20,22 @@ class PreviewStepsState extends State<PreviewSteps> {
   List<Map<String, dynamic>> _steps;
   List<Widget> _steps_widget;
 
-  PreviewStepsState(this._steps);
+  PreviewStepsState(steps) {
+    this._steps = steps;
+    _steps_widget = _steps
+        .asMap()
+        .map((index, item) => MapEntry(index, _buildSteps(index, item)))
+        .values
+        .toList();
+  }
 
-    @override
+  @override
   void initState() {
     _steps_widget = _steps
-                .asMap()
-                .map((index, item) => MapEntry(index, _buildSteps(index, item)))
-                .values
-                .toList();
+        .asMap()
+        .map((index, item) => MapEntry(index, _buildSteps(index, item)))
+        .values
+        .toList();
     super.initState();
   }
 
@@ -55,7 +62,8 @@ class PreviewStepsState extends State<PreviewSteps> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
                     border: Border.all(color: Colors.black, width: 2.0)),
-                child: Image.file(new File('/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/E119EA96-A45D-4A83-B2EB-9E4F5BF5C6A9/tmp/image_picker_A85B9803-3B26-4BE5-95B5-DF296F71BA73-84590-000053ED7230DC46.jpg')),
+                child: Image.file(new File(
+                    '/Users/dmitry/Library/Developer/CoreSimulator/Devices/A7C99D2A-AB83-464C-BCC2-867DD5EE496F/data/Containers/Data/Application/E119EA96-A45D-4A83-B2EB-9E4F5BF5C6A9/tmp/image_picker_A85B9803-3B26-4BE5-95B5-DF296F71BA73-84590-000053ED7230DC46.jpg')),
               ),
             ),
             Expanded(
@@ -76,62 +84,58 @@ class PreviewStepsState extends State<PreviewSteps> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> l = _steps
-                .asMap()
-                .map((index, item) => MapEntry(index, _buildSteps(index, item)))
-                .values
-                .toList();
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Шаги рецепта'),
         ),
         body: ReorderableListView(
-            children: l,
-            // onReorder: (int start, int current) {
-            //   // dragging from top to bottom
-            //   if (start < current) {
-            //     int end = current - 1;
-            //     Map<String, dynamic> startItem = _steps[start];
-            //     int i = 0;
-            //     int local = start;
-            //     do {
-            //       _steps[local] = _steps[++local];
-            //       i++;
-            //     } while (i < end - start);
-            //     _steps[end] = startItem;
-            //   }
-            //   // dragging from bottom to top
-            //   else if (start > current) {
-            //     Map<String, dynamic> startItem = _steps[start];
-            //     for (int i = start; i > current; i--) {
-            //       _steps[i] = _steps[i - 1];
-            //     }
-            //     _steps[current] = startItem;
-            //   }
-            // }
-             onReorder: (int start, int current) {
-        // dragging from top to bottom
-        if (start < current) {
-          int end = current - 1;
-          Map<String,dynamic> startItem = _steps[start];
-          int i = 0;
-          int local = start;
-          do {
-            _steps[local] = _steps[++local];
-            i++;
-          } while (i < end - start);
-          _steps[end] = startItem;
-        }
-        // dragging from bottom to top
-        else if (start > current) {
-          Map<String,dynamic> startItem = _steps[start];
-          for (int i = start; i > current; i--) {
-            _steps[i] = _steps[i - 1];
-          }
-          _steps[current] = startItem;
-        }
-        setState(() {});
-      },
-            ));
+          children: _steps_widget,
+          // onReorder: (int start, int current) {
+          //   // dragging from top to bottom
+          //   if (start < current) {
+          //     int end = current - 1;
+          //     Map<String, dynamic> startItem = _steps[start];
+          //     int i = 0;
+          //     int local = start;
+          //     do {
+          //       _steps[local] = _steps[++local];
+          //       i++;
+          //     } while (i < end - start);
+          //     _steps[end] = startItem;
+          //   }
+          //   // dragging from bottom to top
+          //   else if (start > current) {
+          //     Map<String, dynamic> startItem = _steps[start];
+          //     for (int i = start; i > current; i--) {
+          //       _steps[i] = _steps[i - 1];
+          //     }
+          //     _steps[current] = startItem;
+          //   }
+          // }
+          onReorder: (int start, int current) {
+            // dragging from top to bottom
+            if (start < current) {
+              int end = current - 1;
+              Map<String, dynamic> startItem = _steps[start];
+              int i = 0;
+              int local = start;
+              do {
+                _steps[local] = _steps[++local];
+                i++;
+              } while (i < end - start);
+              _steps[end] = startItem;
+            }
+            // dragging from bottom to top
+            else if (start > current) {
+              Map<String, dynamic> startItem = _steps[start];
+              for (int i = start; i > current; i--) {
+                _steps[i] = _steps[i - 1];
+              }
+              _steps[current] = startItem;
+            }
+            setState(() {});
+          },
+        ));
   }
 }
