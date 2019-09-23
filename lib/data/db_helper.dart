@@ -1,3 +1,4 @@
+import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 import 'package:sqflite/sqflite.dart';
@@ -35,12 +36,41 @@ create table $tableSteps (
   $columnImage text not null,
     $columnRecipeSteps integer not null)
 ''');
+
+      await db.execute('''
+create table $tableIngredients ( 
+  $columnId integer primary key autoincrement, 
+  $columnTitle text not null)
+''');
     });
+  }
+
+  Future<void> insertIngredients(List<Ingredients> ingredients) async {
+    await db.rawInsert(
+        tableIngredients,
+        ingredients
+            .asMap()
+            .map((index, item) => MapEntry(index, item.toMap()))
+            .values
+            .toList());
   }
 
   Future<Recipes> insert(Recipes recipe) async {
     recipe.id = await db.insert(tableRecipes, recipe.toMap());
+    await _insertSteps(recipe.steps, recipe.id);
     return recipe;
+  }
+
+  Future<void> _insertSteps(List<Steps> steps, int id) async {
+    await db.rawInsert(
+        tableSteps,
+        steps
+            .asMap()
+            .map((index, item) {
+              return MapEntry(index, item.toMap());
+            })
+            .values
+            .toList());
   }
 
   Future<Recipes> getRecipes(int id) async {
