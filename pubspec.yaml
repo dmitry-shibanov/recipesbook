@@ -24,13 +24,15 @@ dependencies:
   moor_flutter: ^1.7.0
   permission_handler: '^3.2.0'
   image_gallery: ^1.2.0
-  camera: ^0.5.4+1
+  camera: ^0.5.4
   path_provider: ^1.3.0
   image_picker: ^0.6.1+4
   uuid: 2.0.1
   http: ^0.12.0+2
   firebase_core: ^0.4.0+1
-  firebase_auth: ^0.11.1+3
+  firebase_auth: ^0.14.0+5
+    # firebase_auth: ^0.11.1+3
+  # firebase_storage: ^3.0.6
   cloud_firestore: ^0.12.9+4
   google_sign_in: ^4.0.7
 
@@ -81,6 +83,10 @@ flutter:
     - family: Chilanka
       fonts:
         - asset: public/Chilanka-Regular.ttf
+    - family: DancingScript
+      fonts:
+        - asset: fonts/DancingScript-Regular.ttf
+        - asset: fonts/DancingScript-Bold.ttf
   # fonts:
   #   - family: Schyler
   #     fonts:
