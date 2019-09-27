@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:recipesbook/models/recipes.dart';
@@ -13,21 +16,6 @@ class Api {
 
   FirebaseUser firebaseUser;
 
-  // Api(this.firebaseUser);
-  // List<DocumentSnapshot> d =await Api.getRecipes();
-  // print(d);
-  // DocumentSnapshot d1 = await Api.getSteps(d[0].data['steps'].path);
-  // print(d1);
-  // static Future<List<DocumentSnapshot>> getRecipes() async {
-  //   (await Firestore.instance.collection('recipes').getDocuments()).documents.map((item){
-  //     print("asdsadsadassadasasd"+item.data['image']);
-  //     print(item.data['content']);
-  //     print(item.data['steps']);
-  //     print(item.data['title']);
-  //   });
-  //   return (await Firestore.instance.collection('recipes').getDocuments()).documents;
-  // }
-
   static Future<List<Recipes>> getRecipes() async {
     List<Recipes> recipes = [];
     (await Firestore.instance.collection('recipes').getDocuments())
@@ -40,16 +28,17 @@ class Api {
     return recipes;
   }
 
-  // static Future<DocumentSnapshot> getSteps(String path) async {
-  //   return (await Firestore.instance.document(path).get());
-  // }
-
   static Future<List<Steps>> getSteps(String path) async {
     List<Steps> steps = [];
     Map<String, dynamic> map =
         (await Firestore.instance.document(path).get()).data;
-    List<String> content = map['content'];
-    List<String> images = map['images'];
+    T cast<T>(x) => x is T ? x : null;
+    List<String> content = (map['content'] as Iterable<dynamic>)
+        .map((item) => cast<String>(item))
+        .toList();
+    List<String> images = (map['images'] as Iterable<dynamic>)
+        .map((item) => cast<String>(item))
+        .toList();
     for (int i = 0; i < content.length; i++) {
       Steps step = new Steps();
       step.content = content[i];
@@ -60,35 +49,31 @@ class Api {
     return steps;
   }
 
-  static createRecipe() async {
-    // final StorageReference storageRef =
-    //     FirebaseStorage.instance.ref().child("sadsadasdsa");
+  static createRecipe(Recipes recipe) async {
+    final StorageReference storageRef =
+        FirebaseStorage.instance.ref().child("djsakldals");
 
-// final StorageUploadTask uploadTask = storageRef.putFile(
-//       File(filePath),
-//       StorageMetadata(
-//         contentType: type + '/' + extension,
-//       ),
-//     );
+    final StorageUploadTask uploadTask = storageRef.putFile(
+      File(recipe.image),
+      StorageMetadata(
+        contentType: "image" + '/' + "jpeg",
+      ),
+    );
 
-//     final StorageTaskSnapshot downloadUrl =
-// (await uploadTask.onComplete);
-// final String url = (await downloadUrl.ref.getDownloadURL());
-// print('URL Is $url');
+    final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
+    final String url = (await downloadUrl.ref.getDownloadURL());
+    print('URL Is $url');
 
     Map<String, dynamic> regionData = new Map<String, dynamic>();
-    regionData["title"] = "_textController.text;";
+    regionData = recipe.toMap();
 
-    // regionData["image"] = ;
+    DocumentReference currentRegion =
+        Firestore.instance.collection("region").document("asdhkasdka");
 
-    // DocumentReference currentRegion =
-    //     Firestore.instance.collection("region").document(fileName);
-
-    // Firestore.instance.runTransaction((transaction) async {
-    //   await transaction.set(currentRegion, regionData);
-    print("instance created");
-    // });
-    // await Firestore.instance.collection('recipes')
+    Firestore.instance.runTransaction((transaction) async {
+      await transaction.set(currentRegion, regionData);
+      print("instance created");
+    });
   }
 
   static void signInAnon() async {
@@ -118,9 +103,4 @@ class Api {
     final FirebaseUser currentUser = await _auth.currentUser();
     currentUser.delete();
   }
-
-  // static Future<Api> signInWithGoogle() async{
-  //   final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
-  //   final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  // }
 }

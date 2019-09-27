@@ -1,10 +1,16 @@
 import 'dart:async';
 import 'dart:io' as Io;
 import 'package:image/image.dart';
-
+import 'package:recipesbook/models/recipes.dart';
+import 'package:uuid/uuid.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid_util.dart';
 class SaveFile {
+
+  Recipes recipe;
+  
+  SaveFile(this.recipe);
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -18,7 +24,12 @@ class SaveFile {
      return file;
    }
 
-   Future<Io.File> saveImage(String url) async {
+      Io.File getImageFromSystem(String path) {
+     Io.File file = new Io.File(path);
+     return file;
+   }
+
+   Future<Io.File> saveImageNetwork(String url) async {
 
     final file = await getImageFromNetwork(url);
     //retrieve local path for device
@@ -26,10 +37,34 @@ class SaveFile {
     Image image = decodeImage(file.readAsBytesSync());
 
     Image thumbnail = copyResize(image);
-
+    Io.Directory dir = await createDirectory();
     // Save the thumbnail as a PNG.
-    return new Io.File('$path/${DateTime.now().toUtc().toIso8601String()}.png')
+    return new Io.File('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
       ..writeAsBytesSync(encodePng(thumbnail));
+  }
+
+  Future<Io.File> saveImageLocal(String path) async {
+    var path = await _localPath;
+
+    final file = getImageFromSystem(path);
+
+    Image image = decodeImage(file.readAsBytesSync());
+
+    Image thumbnail = copyResize(image);
+
+    Io.Directory dir = await createDirectory();
+
+    return new Io.File('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
+      ..writeAsBytesSync(encodePng(thumbnail));
+  }
+
+  Future<Io.Directory> createDirectory() async {
+    final directory = await getExternalStorageDirectory();
+                                var uuid =
+                                new Uuid(options: {'grng': UuidUtil.cryptoRNG});
+    final myImagePath = '${directory.path}/${uuid.v1()}' ;
+    final myImgDir = await new Io.Directory(myImagePath).create();
+    return myImgDir;
   }
 }
 

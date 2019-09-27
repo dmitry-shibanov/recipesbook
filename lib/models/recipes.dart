@@ -24,6 +24,6 @@ class Recipes {
     content = map['content'];
     title = map['title'];
     image = map['image'];
-    id = int.parse(map['id']);
+    // id = int.parse(map['id']);
   }
 }

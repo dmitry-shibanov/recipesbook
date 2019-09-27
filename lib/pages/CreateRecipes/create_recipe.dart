@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:recipesbook/data/db_helper.dart';
 // import 'package:recipesbook/models/Receipt.dart';
 import 'package:recipesbook/pages/CreateRecipes/preview_steps.dart';
 import 'dart:convert';
@@ -198,15 +199,14 @@ class CreateReceiptState extends State<CreateReceipt> {
                 onPressed: () async {
                   var dir = await getApplicationDocumentsDirectory();
                   print(dir.path);
-                  // new Directory().create();
-                  print(_steps);
                   await _requestPermission(PermissionGroup.storage);
-
-                  // Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (context) => PreviewSteps(_steps),
-                  //     ));
+                  var _db = new DatabaseProvider();
+                  
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PreviewSteps(_steps),
+                      ));
                 },
                 // async {
                 //     await _requestPermission(PermissionGroup.storage);

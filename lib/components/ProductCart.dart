@@ -54,7 +54,7 @@ class ProductCard extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: FadeInImage(
-                image: AssetImage('public/food.jpg'),
+                image: NetworkImage(_recipe.image),
                 placeholder: AssetImage('public/food.jpg'),
               ),
             ),

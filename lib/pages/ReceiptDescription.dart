@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'dart:math' as math;
 
+import 'package:recipesbook/models/recipes.dart';
+
 class ProductDescription extends StatefulWidget {
   final int _index;
+  Recipes recipe;
   ProductDescription(this._index);
+    ProductDescription.withRecipe(this._index,this.recipe);
   final PageController Page_controller = PageController(initialPage: 0);
   var currentPageValue = 0.0;
+  
 
   @override
   State<StatefulWidget> createState() {
@@ -39,7 +44,7 @@ class ProductDescriptionState extends State<ProductDescription>
               child: FadeInImage(
                 fit: BoxFit.cover,
                 placeholder: AssetImage('public/food.jpg'),
-                image: AssetImage('public/food.jpg'),
+                image: NetworkImage(widget.recipe.image),
               ),
             ),
           ),
@@ -64,7 +69,7 @@ class ProductDescriptionState extends State<ProductDescription>
               'Шаги',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
-            Text(
+            Text(widget.recipe == null ?
                 """Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce viverra purus neque, vitae commodo orci gravida ut. Sed at sem interdum, ullamcorper elit ut, bibendum ipsum. Sed non imperdiet velit. Nam quis elit id eros pharetra iaculis. Sed vulputate quam quis est pharetra, quis molestie urna dignissim. Donec ut urna maximus lorem tempor hendrerit vitae a purus. Nullam id tristique ligula. Duis vel varius augue. Ut mauris velit, rutrum non mollis eu, fermentum vitae nisi. Aenean lacus nisi, convallis vel tortor in, interdum pretium ex. Proin nec ultricies nibh, vitae varius ipsum. Donec lacinia turpis non porta elementum. Nunc augue ante, hendrerit et elit convallis, convallis commodo nulla. Suspendisse eget bibendum lectus, eu finibus sapien. Aenean a viverra eros. In aliquam leo non ligula maximus, id tempor mauris consequat.
 
 Nullam tempor, risus vel scelerisque hendrerit, quam metus consequat mi, eget efficitur ante enim interdum quam. Nullam nibh augue, placerat nec auctor ac, euismod et leo. Aenean sit amet orci et augue posuere pretium. Maecenas at dignissim orci, non consectetur nibh. Suspendisse nec ligula et velit malesuada hendrerit sit amet a neque. Nulla at nisl elit. Pellentesque vel libero erat. In pharetra pharetra iaculis. Vivamus aliquam tristique sapien, nec porttitor nisl aliquam non. Duis tempor a erat ut efficitur. Nulla interdum ac dolor sed maximus. In accumsan nisl et felis cursus lobortis. Nulla ex ipsum, interdum quis malesuada at, facilisis in dui. Donec consectetur turpis enim, et mattis enim scelerisque in.
@@ -79,14 +84,15 @@ Sed facilisis in nibh varius fermentum. Fusce fermentum mauris diam, ac ullamcor
 
 Curabitur iaculis laoreet volutpat. Ut tristique iaculis ipsum ut varius. Cras ultrices luctus turpis a sodales. Nam nisl dolor, laoreet mattis laoreet a, vestibulum vehicula ligula. Pellentesque vehicula felis at massa convallis, et porta sem dictum. Sed ut faucibus enim. Praesent sit amet lacinia dolor, luctus ultrices quam. Ut non placerat dolor. In sagittis luctus interdum. Curabitur fringilla tortor et scelerisque laoreet. Cras arcu ipsum, eleifend aliquam faucibus sed, dignissim nec dui. Nullam sollicitudin metus turpis, id suscipit tellus consectetur id.
 
-Mauris pulvinar vestibulum lacus, in accumsan felis finibus eu. Praesent tincidunt ex sit amet felis fringilla, non sagittis ex tempor. Fusce et nulla volutpat massa mattis dictum. Praesent mattis leo quis felis sagittis consectetur. Donec sodales suscipit augue. Suspendisse leo odio, fermentum eget ante id, vestibulum consectetur tellus. Sed porttitor tortor sed dui fermentum, a sodales tellus rhoncus. Cras sed nibh accumsan, fermentum ex vitae, dapibus arcu. Donec est tortor, ultricies sit amet mauris a, laoreet maximus sem. Proin fringilla ultrices tellus, quis cursus dolor tempus blandit. Donec egestas lectus sit amet nunc tincidunt imperdiet. Curabitur varius luctus elit, in suscipit purus semper in. Morbi mattis euismod lectus, a scelerisque ante. Donec lacus eros, tincidunt quis nunc eget, malesuada vestibulum ipsum. Praesent ullamcorper hendrerit justo eu euismod."""),
+Mauris pulvinar vestibulum lacus, in accumsan felis finibus eu. Praesent tincidunt ex sit amet felis fringilla, non sagittis ex tempor. Fusce et nulla volutpat massa mattis dictum. Praesent mattis leo quis felis sagittis consectetur. Donec sodales suscipit augue. Suspendisse leo odio, fermentum eget ante id, vestibulum consectetur tellus. Sed porttitor tortor sed dui fermentum, a sodales tellus rhoncus. Cras sed nibh accumsan, fermentum ex vitae, dapibus arcu. Donec est tortor, ultricies sit amet mauris a, laoreet maximus sem. Proin fringilla ultrices tellus, quis cursus dolor tempus blandit. Donec egestas lectus sit amet nunc tincidunt imperdiet. Curabitur varius luctus elit, in suscipit purus semper in. Morbi mattis euismod lectus, a scelerisque ante. Donec lacus eros, tincidunt quis nunc eget, malesuada vestibulum ipsum. Praesent ullamcorper hendrerit justo eu euismod."""
+:widget.recipe.content),
             Container(
               // flex: 1,
               height: MediaQuery.of(context).size.height / 2,
               child: PageView.builder(
                 // controller: controller,
                 itemBuilder: _stepReceipt,
-                itemCount: 10,
+                itemCount: widget.recipe.steps.length,
                 // scrollDirection: Axis.horizontal,
               ),
             ),
@@ -195,11 +201,16 @@ Mauris pulvinar vestibulum lacus, in accumsan felis finibus eu. Praesent tincidu
       margin: EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         children: <Widget>[
-          Image.asset('public/food.jpg'),
+          // Image.asset('public/food.jpg'),
+              FadeInImage(
+                image: NetworkImage(widget.recipe.steps[index].image),
+                placeholder: AssetImage('public/food.jpg'),
+              ),
           Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text(
-              'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!',
+            child: Text(widget.recipe == null?
+              'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!':
+              widget.recipe.steps[index].content
             ),
           ),
         ],

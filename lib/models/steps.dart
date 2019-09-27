@@ -14,7 +14,7 @@ class Steps {
   Steps();
 
   Steps.fromMap(Map<String, dynamic> map){
-    id = int.parse(map['id']);
+    // id = int.parse(map['id']);
     content = map['content'];
     image = map['image'];
 
