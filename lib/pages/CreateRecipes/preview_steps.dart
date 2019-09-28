@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:recipesbook/data/db_helper.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/uuid_util.dart';
 
@@ -19,9 +20,10 @@ class PreviewSteps extends StatefulWidget {
 class PreviewStepsState extends State<PreviewSteps> {
   List<Map<String, dynamic>> _steps;
   List<Widget> _steps_widget;
-
+  DatabaseProvider _provider;
   PreviewStepsState(steps) {
     this._steps = steps;
+    _provider = DatabaseProvider();
     _steps_widget = _steps
         .asMap()
         .map((index, item) => MapEntry(index, _buildSteps(index, item)))
@@ -84,58 +86,71 @@ class PreviewStepsState extends State<PreviewSteps> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-        appBar: AppBar(
-          title: Text('Шаги рецепта'),
-        ),
-        body: ReorderableListView(
-          children: _steps_widget,
-          // onReorder: (int start, int current) {
-          //   // dragging from top to bottom
-          //   if (start < current) {
-          //     int end = current - 1;
-          //     Map<String, dynamic> startItem = _steps[start];
-          //     int i = 0;
-          //     int local = start;
-          //     do {
-          //       _steps[local] = _steps[++local];
-          //       i++;
-          //     } while (i < end - start);
-          //     _steps[end] = startItem;
-          //   }
-          //   // dragging from bottom to top
-          //   else if (start > current) {
-          //     Map<String, dynamic> startItem = _steps[start];
-          //     for (int i = start; i > current; i--) {
-          //       _steps[i] = _steps[i - 1];
-          //     }
-          //     _steps[current] = startItem;
-          //   }
-          // }
-          onReorder: (int start, int current) {
-            // dragging from top to bottom
-            if (start < current) {
-              int end = current - 1;
-              Map<String, dynamic> startItem = _steps[start];
-              int i = 0;
-              int local = start;
-              do {
-                _steps[local] = _steps[++local];
-                i++;
-              } while (i < end - start);
-              _steps[end] = startItem;
-            }
-            // dragging from bottom to top
-            else if (start > current) {
-              Map<String, dynamic> startItem = _steps[start];
-              for (int i = start; i > current; i--) {
-                _steps[i] = _steps[i - 1];
+      appBar: AppBar(
+        title: Text('Шаги рецепта'),
+      ),
+      body: Column(
+        children: <Widget>[
+          ReorderableListView(
+            children: _steps_widget,
+            // onReorder: (int start, int current) {
+            //   // dragging from top to bottom
+            //   if (start < current) {
+            //     int end = current - 1;
+            //     Map<String, dynamic> startItem = _steps[start];
+            //     int i = 0;
+            //     int local = start;
+            //     do {
+            //       _steps[local] = _steps[++local];
+            //       i++;
+            //     } while (i < end - start);
+            //     _steps[end] = startItem;
+            //   }
+            //   // dragging from bottom to top
+            //   else if (start > current) {
+            //     Map<String, dynamic> startItem = _steps[start];
+            //     for (int i = start; i > current; i--) {
+            //       _steps[i] = _steps[i - 1];
+            //     }
+            //     _steps[current] = startItem;
+            //   }
+            // }
+            onReorder: (int start, int current) {
+              // dragging from top to bottom
+              if (start < current) {
+                int end = current - 1;
+                Map<String, dynamic> startItem = _steps[start];
+                int i = 0;
+                int local = start;
+                do {
+                  _steps[local] = _steps[++local];
+                  i++;
+                } while (i < end - start);
+                _steps[end] = startItem;
               }
-              _steps[current] = startItem;
-            }
-            setState(() {});
-          },
-        ));
+              // dragging from bottom to top
+              else if (start > current) {
+                Map<String, dynamic> startItem = _steps[start];
+                for (int i = start; i > current; i--) {
+                  _steps[i] = _steps[i - 1];
+                }
+                _steps[current] = startItem;
+              }
+              setState(() {});
+            },
+          ),
+          RaisedButton(
+            color: Colors.white,
+            onPressed: () {},
+            child: Text('Сохрнаить рецепт'),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(
+                  Radius.circular(MediaQuery.of(this.context).size.height / 2)),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

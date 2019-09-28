@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:moor_flutter/moor_flutter.dart' as moor;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:recipesbook/data/db_helper.dart';
-// import 'package:recipesbook/models/Receipt.dart';
+import 'package:recipesbook/mixins/create_recipe_mixins.dart';
+import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/pages/CreateRecipes/preview_steps.dart';
-import 'dart:convert';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
 
-import 'package:recipesbook/pages/CreateRecipes/stepItem/step_recipe.dart';
 import 'package:uuid/uuid_util.dart';
 
 class CreateReceipt extends StatefulWidget {
@@ -21,10 +19,12 @@ class CreateReceipt extends StatefulWidget {
   }
 }
 
-class CreateReceiptState extends State<CreateReceipt> {
+class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
   final List<TextEditingController> controllers = [];
   final List<String> images = [];
   final List<File> imagesFiles = [];
+  var provider = new DatabaseProvider();
+  List<Ingredients> listIngredients;
 
   final List<String> keys = [];
   final List<Map<String, dynamic>> _steps = [];
@@ -58,6 +58,17 @@ class CreateReceiptState extends State<CreateReceipt> {
     return false;
   }
 
+  Future<List<Ingredients>> load_ingredients() async {
+    List<Map<String, dynamic>> maps = await provider.getIngredients();
+    if (maps == null) {}
+
+    List<Ingredients> ingredients = maps.map((item) {
+      var ingredient = Ingredients.fromMap(item);
+      return ingredient;
+    }).toList();
+    return ingredients;
+  }
+
   void _setImage(File path, int index) {
     print(path);
     print("it is our path ${path.toString().replaceFirst('File: ', '')}");
@@ -68,28 +79,21 @@ class CreateReceiptState extends State<CreateReceipt> {
     });
   }
 
-  Widget _buildPasswordTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.text,
-      obscureText: true,
-      decoration: InputDecoration(
-          labelText: 'password', filled: true, fillColor: Colors.white),
-      validator: (String value) {
-        if (value.isEmpty || value.length < 10) {
-          return 'The password should be more than 10 characters';
-        }
-      },
-      onSaved: (String text) {
-        // _password = text;
-      },
-    );
-  }
-
   submitForm() async {
     if (!_globalKey.currentState.validate()) {
       return;
     }
     _globalKey.currentState.save();
+    var dir = await getApplicationDocumentsDirectory();
+    print(dir.path);
+    await _requestPermission(PermissionGroup.storage);
+    var _db = new DatabaseProvider();
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PreviewSteps(_steps),
+        ));
     // Navigator.pushReplacementNamed(context, '/main');
   }
 
@@ -109,16 +113,54 @@ class CreateReceiptState extends State<CreateReceipt> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _CreateRow('Введите заголовок', _general_desc['title']),
+              _CreateRow(
+                  'Введите заголовок', _general_desc['title'], validateTitle),
               Divider(),
-              _CreateRow('Введите описание', _general_desc['decription'], 5),
+              _CreateRow('Введите описание', _general_desc['decription'],
+                  validateContent, 5),
               Divider(),
-              _CreateRow('Введите ингредиенты', _general_desc['ingredients']),
+              Row(
+                children: <Widget>[
+                  FutureBuilder<List<Ingredients>>(
+                    future: load_ingredients(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<Ingredients>> list) {
+                      if (!list.hasData) {
+                        return Text('Идет загрузка');
+                      }
+                      return DropdownButton<String>(
+                        // value: dropdownValue,
+                        icon: Icon(Icons.arrow_downward),
+                        iconSize: 24,
+                        elevation: 16,
+                        style: TextStyle(color: Colors.deepPurple),
+                        underline: Container(
+                          height: 2,
+                          color: Colors.deepPurpleAccent,
+                        ),
+                        onChanged: (_) {
+                          // setState(() {
+                          //   dropdownValue = newValue;
+                          // });
+                        },
+                        items: list.data
+                            .map<DropdownMenuItem<String>>((Ingredients value) {
+                          return DropdownMenuItem<String>(
+                            value: value.title,
+                            child: Text(value.title),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+                ],
+              ),
               Divider(),
               GestureDetector(
                   child: Padding(
                       padding: EdgeInsets.all(10.0),
-                      child: Text('Время приготовления $_timeOfDay')),
+                      child: Text(
+                          'Время приготовления ${_timeOfDay.format(context)}')),
                   onTap: selectTime),
               Divider(),
               Padding(
@@ -196,30 +238,8 @@ class CreateReceiptState extends State<CreateReceipt> {
               RaisedButton(
                 key: timed,
                 color: Colors.white,
-                onPressed: () async {
-                  var dir = await getApplicationDocumentsDirectory();
-                  print(dir.path);
-                  await _requestPermission(PermissionGroup.storage);
-                  var _db = new DatabaseProvider();
-                  
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PreviewSteps(_steps),
-                      ));
-                },
-                // async {
-                //     await _requestPermission(PermissionGroup.storage);
-                //     final _db = new MyDatabase();
-                //     // Recipes receipt = new Recipes(content: 'sklaklsalksa',title: 'try create');
-                //     ReceiptCompanion companion = new ReceiptCompanion(content: moor.Value('sklaklsalksa'),title: moor.Value('Tanother time'));
-                //                       var o = await _db.insertRecipe(companion);
-                //     print(o);
-                //     var all = await _db.allRecipes;
-                //     print(all[all.length-1].title);
-
-                // },
-                child: Text('Создать рецепт'),
+                onPressed: submitForm,
+                child: Text('Посмотреть шаги'),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(
                       MediaQuery.of(this.context).size.height / 2)),
@@ -233,8 +253,6 @@ class CreateReceiptState extends State<CreateReceipt> {
   }
 
   Widget _buildSteps(BuildContext context, int index) {
-    String result = "";
-    // File file = new File('/storage/emulated/0/Android/data/shibanov.recipesbook/files/Pictures/scaled_49884ac3-294b-4377-8074-0a1cf843a4c95101920437980622551.jpg');
     File file;
     return Dismissible(
       key: Key('adsla;da$index'),
@@ -279,7 +297,6 @@ class CreateReceiptState extends State<CreateReceipt> {
                                                 await ImagePicker.pickImage(
                                                     source:
                                                         ImageSource.gallery);
-                                            // _steps[index]['image'] =
                                             Navigator.pop(context, image);
                                           }
                                         },
@@ -315,12 +332,6 @@ class CreateReceiptState extends State<CreateReceipt> {
                           print('came');
                           Future.delayed(Duration(milliseconds: 2000),
                               () => _setImage(files, index));
-                          // setState(() {
-                          // print(result);
-                          // _setImage(result, index);
-                          // file = new File(result);
-                          // file = result;
-                          // });
                         },
                       )
                     : Image.file(imagesFiles[index]),
@@ -328,12 +339,12 @@ class CreateReceiptState extends State<CreateReceipt> {
             ),
             Expanded(
               flex: 2,
-              child: TextField(
+              child: TextFormField(
                 decoration: InputDecoration(
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0)))),
-                onChanged: (String value) {
-                  // data_step['description'] = value;
+                validator: validateStep,
+                onSaved: (String value) {
                   _steps[index]['content'] = value;
                 },
                 onTap: () {
@@ -358,7 +369,8 @@ class CreateReceiptState extends State<CreateReceipt> {
     });
   }
 
-  Widget _CreateRow(String title, String inf, [int maxLines = 1]) {
+  Widget _CreateRow(String title, String save, Function validator,
+      [int maxLines = 1]) {
     return Padding(
       padding: EdgeInsets.all(10.0),
       child: Row(
@@ -370,7 +382,7 @@ class CreateReceiptState extends State<CreateReceipt> {
           ),
           Expanded(
             flex: 2,
-            child: TextField(
+            child: TextFormField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderSide: BorderSide(width: 10.0),
@@ -380,8 +392,9 @@ class CreateReceiptState extends State<CreateReceipt> {
                 ),
               ),
               maxLines: maxLines,
-              onChanged: (String value) {
-                setState(() => inf = value);
+              validator: validator,
+              onSaved: (String value) {
+                save = value;
               },
             ),
           )

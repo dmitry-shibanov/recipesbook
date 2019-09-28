@@ -1,0 +1,5 @@
+https://stackru.com/questions/49214548/flutter-zagruzka-i-keshirovanie-izobrazhenij - temporary directory
+2https://stackoverflow.com/questions/51338041/how-to-save-image-file-in-flutter-file-selected-using-image-picker-plugin - save image locally
+https://stackoverflow.com/questions/49455079/flutter-save-a-network-image-to-local-directory
+https://stackoverflow.com/questions/52299112/flutter-download-an-image-from-url
+https://pub.dev/packages/image_downloader#-readme-tab-

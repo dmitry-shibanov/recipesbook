@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 
@@ -26,6 +27,15 @@ class Api {
       recipes.add(Recipes.fromMap(item.data));
     });
     return recipes;
+  }
+
+  static Future<List<Ingredients>> getIngredinets() async {
+    List<Ingredients> ingredients = (await Firestore.instance.collection('ingredients').getDocuments()).documents.map((item){
+      var ingredient = Ingredients.fromMap(item.data);
+      return ingredient;
+    });
+
+    return ingredients;
   }
 
   static Future<List<Steps>> getSteps(String path) async {

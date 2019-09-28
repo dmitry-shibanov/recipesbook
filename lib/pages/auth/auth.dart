@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:recipesbook/mixins/validator_mixins.dart';
 import 'package:recipesbook/services/api.dart';
 
 enum AuthMode { SignUp, Login }
@@ -24,7 +25,7 @@ class Regestration extends StatefulWidget {
 }
 
 class RegesrtationState extends State<Regestration>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, ValidatorMixins {
   String _login = '';
   String _password = '';
   bool _acceptTerms = true;
@@ -70,13 +71,7 @@ class RegesrtationState extends State<Regestration>
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
           labelText: 'Login', filled: true, fillColor: Colors.white),
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                .hasMatch(value)) {
-          return 'The mail is not valid';
-        }
-      },
+      validator: validateEmail,
       onSaved: (String text) {
         _login = text;
       },
@@ -89,11 +84,7 @@ class RegesrtationState extends State<Regestration>
       obscureText: true,
       decoration: InputDecoration(
           labelText: 'password', filled: true, fillColor: Colors.white),
-      validator: (String value) {
-        if (value.isEmpty || value.length < 10) {
-          return 'The password should be more than 10 characters';
-        }
-      },
+      validator: validatePassword,
       onSaved: (String text) {
         _password = text;
       },
@@ -142,10 +133,6 @@ class RegesrtationState extends State<Regestration>
       return;
     }
     _globalKey.currentState.save();
-    // List<DocumentSnapshot> d =await Api.getRecipes();
-    // print(d);
-    // DocumentSnapshot d1 = await Api.getSteps(d[0].data['steps'].path);
-    // print(d1);
     Navigator.pushReplacementNamed(context, '/main');
   }
 

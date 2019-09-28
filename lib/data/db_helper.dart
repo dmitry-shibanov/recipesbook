@@ -16,10 +16,17 @@ final String columnImage = 'image';
 final String columnRecipeSteps = 'stepsrecipe';
 
 class DatabaseProvider {
-  Database db;
+  Database _db;
+  static final DatabaseProvider _provider = DatabaseProvider._internal();
+
+  factory DatabaseProvider() {
+    return _provider;
+  }
+
+  DatabaseProvider._internal();
 
   Future open(String path) async {
-    db = await openDatabase(path, version: 1,
+    _db = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       await db.execute('''
 create table $tableRecipes ( 
@@ -46,7 +53,7 @@ create table $tableIngredients (
   }
 
   Future<void> insertIngredients(List<Ingredients> ingredients) async {
-    await db.rawInsert(
+    await _db.rawInsert(
         tableIngredients,
         ingredients
             .asMap()
@@ -56,13 +63,13 @@ create table $tableIngredients (
   }
 
   Future<Recipes> insert(Recipes recipe) async {
-    recipe.id = await db.insert(tableRecipes, recipe.toMap());
+    recipe.id = await _db.insert(tableRecipes, recipe.toMap());
     await _insertSteps(recipe.steps, recipe.id);
     return recipe;
   }
 
   Future<void> _insertSteps(List<Steps> steps, int id) async {
-    await db.rawInsert(
+    await _db.rawInsert(
         tableSteps,
         steps
             .asMap()
@@ -73,8 +80,8 @@ create table $tableIngredients (
             .toList());
   }
 
-  Future<Recipes> getRecipes(int id) async {
-    List<Map> maps = await db.query(tableRecipes,
+  Future<Recipes> getRecipe(int id) async {
+    List<Map> maps = await _db.query(tableRecipes,
         columns: [columnId, columnContent, columnTitle, columnImage],
         where: '$columnId = ?',
         whereArgs: [id]);
@@ -90,7 +97,7 @@ create table $tableIngredients (
   }
 
   Future<List<Map<String, dynamic>>> getSteps(int id) async {
-    List<Map> maps = await db.query(tableSteps,
+    List<Map> maps = await _db.query(tableSteps,
         columns: [columnId, columnContent, columnRecipeSteps, columnImage],
         where: '$columnRecipeSteps = ?',
         whereArgs: [id]);
@@ -100,16 +107,24 @@ create table $tableIngredients (
     return null;
   }
 
+  Future<List<Map<String, dynamic>>> getIngredients() async {
+    List<Map<String, dynamic>> maps = await _db.query(tableIngredients);
+    if (maps.length > 0) {
+      return maps;
+    }
+    return null;
+  }
+
   Future<int> delete(int id) async {
-    await db.delete(tableRecipes, where: '$columnId = ?', whereArgs: [id]);
-    return await db
+    await _db.delete(tableRecipes, where: '$columnId = ?', whereArgs: [id]);
+    return await _db
         .delete(tableSteps, where: '$columnRecipeSteps = ?', whereArgs: [id]);
   }
 
   Future<int> update(Recipes recipes) async {
-    return await db.update(tableRecipes, recipes.toMap(),
+    return await _db.update(tableRecipes, recipes.toMap(),
         where: '$columnId = ?', whereArgs: [recipes.id]);
   }
 
-  Future close() async => db.close();
+  Future close() async => _db.close();
 }

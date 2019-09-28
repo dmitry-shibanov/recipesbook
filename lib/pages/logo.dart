@@ -1,7 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:recipesbook/data/db_helper.dart';
+import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/services/api.dart';
+import 'package:sqflite/sqflite.dart';
 
 class LogoPage extends StatelessWidget {
   @override
@@ -49,10 +52,21 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
     animationPhrases =
         CurvedAnimation(parent: controllerPhrases, curve: Curves.easeIn);
-    animation.addStatusListener((status) {
+    animation.addStatusListener((status) async {
       if (status == AnimationStatus.completed) {
-        var future = new Future.delayed(const Duration(milliseconds: 1000), () {
+        var future =
+            new Future.delayed(const Duration(milliseconds: 1000), () async {
           // Api.signOutAnon();
+          DatabaseProvider provider = new DatabaseProvider();
+          var databasePath = await await getDatabasesPath();
+          String path = databasePath + "demo.db";
+          provider.open(path);
+          var hasIngredients = (await provider.getIngredients()).length > 0;
+          if (!hasIngredients) {
+            List<Ingredients> ingredients = await Api.getIngredinets();
+            provider.insertIngredients(ingredients);
+          }
+
           Navigator.pushReplacementNamed(context, '/auth');
         });
         // var subscription = future.asStream().listen(doStuffCallback);
