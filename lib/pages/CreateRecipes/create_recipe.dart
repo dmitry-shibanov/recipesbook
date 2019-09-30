@@ -121,6 +121,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
               Divider(),
               Row(
                 children: <Widget>[
+
                   FutureBuilder<List<Ingredients>>(
                     future: load_ingredients(),
                     builder: (BuildContext context,
@@ -128,11 +129,15 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                       if (!list.hasData) {
                         return Text('Идет загрузка');
                       }
-                      return DropdownButton<String>(
+                      return Container(
+                        margin: EdgeInsets.symmetric(horizontal: 16.0,),
+                        child: DropdownButton<String>(
+                        value: 'Шафран',
                         // value: dropdownValue,
                         icon: Icon(Icons.arrow_downward),
                         iconSize: 24,
                         elevation: 16,
+                        isExpanded: true,
                         style: TextStyle(color: Colors.deepPurple),
                         underline: Container(
                           height: 2,
@@ -150,6 +155,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                             child: Text(value.title),
                           );
                         }).toList(),
+                      ),
                       );
                     },
                   ),

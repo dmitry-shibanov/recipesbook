@@ -31,9 +31,10 @@ class Api {
 
   static Future<List<Ingredients>> getIngredinets() async {
     List<Ingredients> ingredients = (await Firestore.instance.collection('ingredients').getDocuments()).documents.map((item){
-      var ingredient = Ingredients.fromMap(item.data);
+      print(item);
+      var ingredient = Ingredients.fromJson(item.data);
       return ingredient;
-    });
+    }).toList();
 
     return ingredients;
   }

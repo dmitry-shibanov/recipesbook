@@ -53,13 +53,15 @@ create table $tableIngredients (
   }
 
   Future<void> insertIngredients(List<Ingredients> ingredients) async {
-    await _db.rawInsert(
-        tableIngredients,
-        ingredients
-            .asMap()
-            .map((index, item) => MapEntry(index, item.toMap()))
-            .values
-            .toList());
+    ingredients.forEach((item) async =>await _db.insert(tableIngredients, item.toMapSave()));
+    
+    // await _db.rawInsert(
+    //     tableIngredients,
+    //     ingredients
+    //         .asMap()
+    //         .map((index, item) => MapEntry(index, item.toMapSave()))
+    //         .values
+    //         .toList());
   }
 
   Future<Recipes> insert(Recipes recipe) async {
@@ -112,7 +114,7 @@ create table $tableIngredients (
     if (maps.length > 0) {
       return maps;
     }
-    return null;
+    return [];
   }
 
   Future<int> delete(int id) async {

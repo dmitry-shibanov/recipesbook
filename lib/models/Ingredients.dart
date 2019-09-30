@@ -11,10 +11,21 @@ class Ingredients {
     return map;
   }
 
+  Map<String,dynamic> toMapSave(){
+    Map<String,dynamic> map = new Map();
+
+    map['title'] = title;
+    return map;
+  }
+
   Ingredients();
 
   Ingredients.fromMap(Map<String,dynamic> map){
-    id = int.parse(map['id']);
     title = map['title'];
+    id = map['_id'];
+  }
+
+  Ingredients.fromJson(Map<String,dynamic> map){
+    title = map['name'];
   }
 }

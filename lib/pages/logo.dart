@@ -59,8 +59,8 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
           // Api.signOutAnon();
           DatabaseProvider provider = new DatabaseProvider();
           var databasePath = await await getDatabasesPath();
-          String path = databasePath + "demo.db";
-          provider.open(path);
+          String path = databasePath + "/demo.db";
+          await provider.open(path);
           var hasIngredients = (await provider.getIngredients()).length > 0;
           if (!hasIngredients) {
             List<Ingredients> ingredients = await Api.getIngredinets();
