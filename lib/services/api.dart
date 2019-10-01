@@ -1,10 +1,12 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
@@ -27,6 +29,25 @@ class Api {
       recipes.add(Recipes.fromMap(item.data));
     });
     return recipes;
+  }
+
+    Future<File> _saveToTemporaryDirectory(String name) async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    print(androidInfo.hardware)
+
+    final Directory temp = await getTemporaryDirectory();
+    final File imageFile = File('${temp.path}/images/someImageFile.png');
+
+    if (await imageFile.exists()) {
+      return imageFile;
+    } else {
+      // Image doesn't exist in cache
+      await imageFile.create(recursive: true);
+      // Download the image and write to above file
+    }
+
+    return null;
   }
 
   static Future<List<Ingredients>> getIngredinets() async {

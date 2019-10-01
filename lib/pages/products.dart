@@ -1,5 +1,9 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/components/ProductCart.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/pages/ReceiptDescription.dart';
@@ -74,5 +78,22 @@ class ProductsListState extends State {
               )
             ],
           );
+    // return StreamBuilder(
+    //   stream: Firestore.instance.collection('recipes').snapshots(),
+    //   builder: (context,snapshot){
+    //     if(!snapshot.hasData){
+    //       return Center(child: CircularProgressIndicator());
+    //     }else{
+    //       List<Future<Recipes>> recipes = (snapshot.data.documents as Iterable).map((item) async {
+    //         var recipe = new Recipes.fromMap(item);
+
+    //         recipe.steps = await Api.getSteps(item['steps'].path);
+    //         recipe.documentId = item.documentID;
+    //         return recipe;
+    //       }).toList();
+
+    //     }
+    //   },
+    // );
   }
 }

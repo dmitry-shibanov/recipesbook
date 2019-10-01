@@ -40,6 +40,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
   final PermissionHandler _permissionHandler = PermissionHandler();
   bool tapped = false;
   final GlobalKey<FormState> _globalKey = GlobalKey();
+  String _productCount = "";
 
   @override
   void initState() {
@@ -120,20 +121,30 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                   validateContent, 5),
               Divider(),
               Row(
-                children: <Widget>[
-
+                children: <Widget>[Expanded(child:
+                  TextField(
+                    onChanged: (String value){
+                      _productCount = value;
+                    },
+                  ),
+                  flex: 1,),
+                  Expanded(
+                    flex: 2,
+                    child:
                   FutureBuilder<List<Ingredients>>(
                     future: load_ingredients(),
                     builder: (BuildContext context,
                         AsyncSnapshot<List<Ingredients>> list) {
+                          String dropdownValue = "Шафран";
                       if (!list.hasData) {
                         return Text('Идет загрузка');
                       }
+
                       return Container(
                         margin: EdgeInsets.symmetric(horizontal: 16.0,),
                         child: DropdownButton<String>(
-                        value: 'Шафран',
-                        // value: dropdownValue,
+                        // value: 'Шафран',
+                        value: dropdownValue,
                         icon: Icon(Icons.arrow_downward),
                         iconSize: 24,
                         elevation: 16,
@@ -143,10 +154,10 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                           height: 2,
                           color: Colors.deepPurpleAccent,
                         ),
-                        onChanged: (_) {
-                          // setState(() {
-                          //   dropdownValue = newValue;
-                          // });
+                        onChanged: (value) {
+                          setState(() {
+                            dropdownValue = value;
+                          });
                         },
                         items: list.data
                             .map<DropdownMenuItem<String>>((Ingredients value) {
@@ -159,6 +170,13 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                       );
                     },
                   ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: IconButton(icon: Icon(Icons.check),onPressed: (){
+
+                    },),
+                  )
                 ],
               ),
               Divider(),
