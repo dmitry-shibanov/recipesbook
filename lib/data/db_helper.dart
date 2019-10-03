@@ -8,12 +8,15 @@ final String tableRecipes = 'recipes';
 final String tableSteps = 'steps';
 final String tableIngredients = 'ingredients';
 final String tableUser = 'user';
+final String tableRecipeIngredient = 'recipeingredient';
 
 final String columnId = '_id';
 final String columnTitle = 'title';
 final String columnContent = 'content';
 final String columnImage = 'image';
 final String columnRecipeSteps = 'stepsrecipe';
+final String columnRecipe = "recipe";
+final String columnIngredient = "ingredient";
 
 class DatabaseProvider {
   Database _db;
@@ -49,6 +52,12 @@ create table $tableIngredients (
   $columnId integer primary key autoincrement, 
   $columnTitle text not null)
 ''');
+      await db.execute('''
+      create table $tableRecipeIngredient (
+        $columnId integer primary key autoincrement,
+        $
+      )
+      ''');
     });
   }
 

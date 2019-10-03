@@ -1,6 +1,7 @@
 class Ingredients {
   int id;
   String title;
+  String count;
 
   Map<String, dynamic> toMap(){
     Map<String,dynamic> map = new Map();

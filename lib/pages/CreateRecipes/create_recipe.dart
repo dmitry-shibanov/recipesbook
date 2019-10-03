@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'package:recipesbook/data/db_helper.dart';
 import 'package:recipesbook/mixins/create_recipe_mixins.dart';
 import 'package:recipesbook/models/Ingredients.dart';
@@ -25,6 +24,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
   final List<File> imagesFiles = [];
   var provider = new DatabaseProvider();
   List<Ingredients> listIngredients;
+  List<Ingredients> _recipeIngredient;
 
   final List<String> keys = [];
   final List<Map<String, dynamic>> _steps = [];
@@ -44,6 +44,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
 
   @override
   void initState() {
+    _recipeIngredient = [];
     super.initState();
   }
 
@@ -88,7 +89,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
     var dir = await getApplicationDocumentsDirectory();
     print(dir.path);
     await _requestPermission(PermissionGroup.storage);
-    var _db = new DatabaseProvider();
+    // var _db = new DatabaseProvider();
 
     Navigator.push(
         context,
@@ -96,6 +97,13 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
           builder: (context) => PreviewSteps(_steps),
         ));
     // Navigator.pushReplacementNamed(context, '/main');
+  }
+
+  Widget _buildIngredients(BuildContext context, int index){
+    return Row(children: <Widget>[
+      Expanded(flex: 1,child: Text(_recipeIngredient[index].count),),
+      Expanded(flex: 2,child: Text(_recipeIngredient[index].title),)
+    ],);
   }
 
   @override
@@ -120,62 +128,76 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
               _CreateRow('Введите описание', _general_desc['decription'],
                   validateContent, 5),
               Divider(),
+              ListView.builder(
+                controller: ScrollController(keepScrollOffset: false),
+                shrinkWrap: true,
+                itemBuilder: _buildIngredients,
+                itemCount: _recipeIngredient.length,
+              ),
+              Divider(),
               Row(
-                children: <Widget>[Expanded(child:
-                  TextField(
-                    onChanged: (String value){
-                      _productCount = value;
-                    },
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      margin: EdgeInsets.only(left: 8.0),
+                      child: TextField(
+                        onChanged: (String value) {
+                          _productCount = value;
+                        },
+                      ),
+                    ),
+                    flex: 1,
                   ),
-                  flex: 1,),
                   Expanded(
                     flex: 2,
-                    child:
-                  FutureBuilder<List<Ingredients>>(
-                    future: load_ingredients(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<Ingredients>> list) {
-                          String dropdownValue = "Шафран";
-                      if (!list.hasData) {
-                        return Text('Идет загрузка');
-                      }
+                    child: FutureBuilder<List<Ingredients>>(
+                      future: load_ingredients(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<List<Ingredients>> list) {
+                        if (!list.hasData) {
+                          return Text('Идет загрузка');
+                        }
 
-                      return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 16.0,),
-                        child: DropdownButton<String>(
-                        // value: 'Шафран',
-                        value: dropdownValue,
-                        icon: Icon(Icons.arrow_downward),
-                        iconSize: 24,
-                        elevation: 16,
-                        isExpanded: true,
-                        style: TextStyle(color: Colors.deepPurple),
-                        underline: Container(
-                          height: 2,
-                          color: Colors.deepPurpleAccent,
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            dropdownValue = value;
-                          });
-                        },
-                        items: list.data
-                            .map<DropdownMenuItem<String>>((Ingredients value) {
-                          return DropdownMenuItem<String>(
-                            value: value.title,
-                            child: Text(value.title),
-                          );
-                        }).toList(),
-                      ),
-                      );
-                    },
-                  ),
+                        String _value = list.data[0].title;
+                        return Container(
+                          margin: EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                          ),
+                          child: DropdownButton<String>(
+                            // value: 'Шафран',
+                            value: _value,
+                            icon: Icon(Icons.arrow_downward),
+                            iconSize: 24,
+                            elevation: 16,
+                            isExpanded: true,
+                            style: TextStyle(color: Colors.deepPurple),
+                            underline: Container(
+                              height: 2,
+                              color: Colors.deepPurpleAccent,
+                            ),
+                            onChanged: (value) {
+                              setState(() {
+                                _value = value;
+                              });
+                            },
+                            items: list.data.map<DropdownMenuItem<String>>(
+                                (Ingredients value) {
+                              return DropdownMenuItem<String>(
+                                value: value.title,
+                                child: Text(value.title),
+                              );
+                            }).toList(),
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   Expanded(
                     flex: 1,
-                    child: IconButton(icon: Icon(Icons.check),onPressed: (){
-
-                    },),
+                    child: IconButton(
+                      icon: Icon(Icons.check),
+                      onPressed: () {},
+                    ),
                   )
                 ],
               ),

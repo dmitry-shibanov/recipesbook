@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/mixins/validator_mixins.dart';
 import 'package:recipesbook/services/api.dart';
+import 'package:system_info/system_info.dart';
 
 enum AuthMode { SignUp, Login }
 
@@ -39,7 +41,9 @@ class RegesrtationState extends State<Regestration>
     _controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
     authVariant = AuthMode.Login;
-    _animation = new Tween<Offset>(begin: Offset(0.0,-2.0),end: Offset.zero).animate(CurvedAnimation(parent:_controller,curve: Curves.fastOutSlowIn));
+    _animation = new Tween<Offset>(begin: Offset(0.0, -2.0), end: Offset.zero)
+        .animate(
+            CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     super.initState();
   }
 
@@ -97,21 +101,21 @@ class RegesrtationState extends State<Regestration>
       child: SlideTransition(
         position: _animation,
         child: TextFormField(
-        keyboardType: TextInputType.text,
-        obscureText: true,
-        decoration: InputDecoration(
-            labelText: 'Confirm password',
-            filled: true,
-            fillColor: Colors.white),
-        validator: (String value) {
-          if (value != _password && authVariant == AuthMode.SignUp) {
-            return 'Passwords should be equal';
-          }
-        },
-        onSaved: (String text) {
-          // _password = text;
-        },
-      ),
+          keyboardType: TextInputType.text,
+          obscureText: true,
+          decoration: InputDecoration(
+              labelText: 'Confirm password',
+              filled: true,
+              fillColor: Colors.white),
+          validator: (String value) {
+            if (value != _password && authVariant == AuthMode.SignUp) {
+              return 'Passwords should be equal';
+            }
+          },
+          onSaved: (String text) {
+            // _password = text;
+          },
+        ),
       ),
     );
   }
@@ -129,6 +133,12 @@ class RegesrtationState extends State<Regestration>
   }
 
   submitForm() async {
+    double MEGABYTE = 1024.0*1024*1024;
+    print(
+        "Free physical memory    : ${SysInfo.getFreePhysicalMemory() / MEGABYTE} MB");
+
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     if (!_globalKey.currentState.validate()) {
       return;
     }

@@ -34,7 +34,7 @@ class Api {
     Future<File> _saveToTemporaryDirectory(String name) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    print(androidInfo.hardware)
+    print(androidInfo.hardware);
 
     final Directory temp = await getTemporaryDirectory();
     final File imageFile = File('${temp.path}/images/someImageFile.png');
