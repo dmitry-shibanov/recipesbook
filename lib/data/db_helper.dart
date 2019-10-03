@@ -29,7 +29,7 @@ class DatabaseProvider {
   DatabaseProvider._internal();
 
   Future open(String path) async {
-    _db = await openDatabase(path, version: 1,
+    _db = await openDatabase(path, version: 3,
         onCreate: (Database db, int version) async {
       await db.execute('''
 create table $tableRecipes ( 
@@ -55,7 +55,8 @@ create table $tableIngredients (
       await db.execute('''
       create table $tableRecipeIngredient (
         $columnId integer primary key autoincrement,
-        $
+        $columnRecipe integer not null,
+        $columnIngredient integer not null)
       )
       ''');
     });
@@ -63,14 +64,15 @@ create table $tableIngredients (
 
   Future<void> insertIngredients(List<Ingredients> ingredients) async {
     ingredients.forEach((item) async =>await _db.insert(tableIngredients, item.toMapSave()));
-    
-    // await _db.rawInsert(
-    //     tableIngredients,
-    //     ingredients
-    //         .asMap()
-    //         .map((index, item) => MapEntry(index, item.toMapSave()))
-    //         .values
-    //         .toList());
+  }
+
+  Future<void> _insertRecipeIngredient(List<Ingredients> ingredients, int id){
+    ingredients.forEach((item) async {
+      var map = new Map();
+      map[columnRecipe] = id;
+      map[columnIngredient] = item.id;
+      await _db.insert(tableRecipeIngredient, map);
+    });
   }
 
   Future<Recipes> insert(Recipes recipe) async {

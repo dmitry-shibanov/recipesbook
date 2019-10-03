@@ -22,6 +22,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
   final List<TextEditingController> controllers = [];
   final List<String> images = [];
   final List<File> imagesFiles = [];
+  Ingredients newIngredient;
   var provider = new DatabaseProvider();
   List<Ingredients> listIngredients;
   List<Ingredients> _recipeIngredient;
@@ -100,7 +101,9 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
   }
 
   Widget _buildIngredients(BuildContext context, int index){
-    return Row(children: <Widget>[
+    return Row(
+      // key: Key(_recipeIngredient[index].id.toString()),
+      children: <Widget>[
       Expanded(flex: 1,child: Text(_recipeIngredient[index].count),),
       Expanded(flex: 2,child: Text(_recipeIngredient[index].title),)
     ],);
@@ -164,7 +167,6 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                             horizontal: 8.0,
                           ),
                           child: DropdownButton<String>(
-                            // value: 'Шафран',
                             value: _value,
                             icon: Icon(Icons.arrow_downward),
                             iconSize: 24,
@@ -178,6 +180,9 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                             onChanged: (value) {
                               setState(() {
                                 _value = value;
+                                newIngredient = new Ingredients();
+                                newIngredient.title = value;
+                                newIngredient.count = _productCount;
                               });
                             },
                             items: list.data.map<DropdownMenuItem<String>>(
@@ -196,7 +201,9 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                     flex: 1,
                     child: IconButton(
                       icon: Icon(Icons.check),
-                      onPressed: () {},
+                      onPressed: () {
+                        _recipeIngredient.add(newIngredient);
+                      },
                     ),
                   )
                 ],
