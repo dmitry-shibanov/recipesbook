@@ -52,18 +52,18 @@ class MyApp extends StatelessWidget {
         '/gallery': (BuildContext context) => Gallery(),
         '/camera': (BuildContext context) => MyCamera()
       },
-      onGenerateRoute: (RouteSettings settings) {
-        final List<String> pathElements = settings.name.split('/');
-        if (pathElements[0] != '') {
-          return null;
-        }
-        if (pathElements[1] == 'product') {
-          final int index = int.parse(pathElements[2]);
-          return CustomRoute<bool>(
-              builder: (BuildContext context) => ProductDescription(index));
-        }
-        return null;
-      },
+      // onGenerateRoute: (RouteSettings settings) {
+      //   final List<String> pathElements = settings.name.split('/');
+      //   if (pathElements[0] != '') {
+      //     return null;
+      //   }
+      //   if (pathElements[1] == 'product') {
+      //     final int index = int.parse(pathElements[2]);
+      //     return CustomRoute<bool>(
+      //         builder: (BuildContext context) => ProductDescription.fromDB(index));
+      //   }
+      //   return null;
+      // },
     );
   }
 }
@@ -82,12 +82,38 @@ class _MyHomePageState extends State<MyHomePage>
   int _counter = 0;
   int _bottomIndex = 0;
 
+  Widget appBarTitle = new Text("Рецепты", style: new TextStyle(color: Colors.white),);
+  Icon actionIcon = new Icon(Icons.search, color: Colors.white,);
+  final key = new GlobalKey<ScaffoldState>();
+  final TextEditingController _searchQuery = new TextEditingController();
+  List<String> _list;
+  bool _IsSearching;
+  String _searchText = "";
+
+    _SearchListState() {
+    _searchQuery.addListener(() {
+      if (_searchQuery.text.isEmpty) {
+        setState(() {
+          _IsSearching = false;
+          _searchText = "";
+        });
+      }
+      else {
+        setState(() {
+          _IsSearching = true;
+          _searchText = _searchQuery.text;
+        });
+      }
+    });
+  }
+
   void _createRecipe() {
     setState(() {
       _bottomIndex = 1;
     });
   }
-
+  // https://medium.com/@lucassaltoncardinali/keeping-state-with-the-bottom-navigation-bar-in-flutter-69e4168878e1
+//https://stackoverflow.com/questions/49966980/how-to-create-toolbar-searchview-in-flutter
   Widget loadPage() {
     Widget widget = null;
     switch (_bottomIndex) {
@@ -110,6 +136,22 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
+    void _handleSearchStart() {
+    setState(() {
+      _IsSearching = true;
+    });
+  }
+
+  void _handleSearchEnd() {
+    setState(() {
+      this.actionIcon = new Icon(Icons.search, color: Colors.white,);
+      this.appBarTitle =
+      new Text("Рецепты", style: new TextStyle(color: Colors.white),);
+      _IsSearching = false;
+      _searchQuery.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -117,7 +159,32 @@ class _MyHomePageState extends State<MyHomePage>
       child: Scaffold(
         resizeToAvoidBottomPadding: false,
         appBar: AppBar(
-          title: Text(widget.title),
+          actions: <Widget>[
+            _bottomIndex == 0 ? new IconButton(icon: actionIcon, onPressed: () {
+            setState(() {
+              if (this.actionIcon.icon == Icons.search) {
+                this.actionIcon = new Icon(Icons.close, color: Colors.white,);
+                this.appBarTitle = new TextField(
+                  controller: _searchQuery,
+                  style: new TextStyle(
+                    color: Colors.white,
+
+                  ),
+                  decoration: new InputDecoration(
+                      prefixIcon: new Icon(Icons.search, color: Colors.white),
+                      hintText: "Search...",
+                      hintStyle: new TextStyle(color: Colors.white)
+                  ),
+                );
+                _handleSearchStart();
+              }
+              else {
+                _handleSearchEnd();
+              }
+            });
+          },):Container(),
+          ],
+          title: appBarTitle,
           bottom: _bottomIndex == 0
               ? TabBar(
                   labelColor: Colors.white,

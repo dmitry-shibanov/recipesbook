@@ -5,7 +5,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/components/address.dart';
 import 'package:recipesbook/components/price_tag.dart';
 import 'package:recipesbook/components/title_default.dart';
+import 'package:recipesbook/helpers/custom_route.dart';
 import 'package:recipesbook/models/recipes.dart';
+import 'package:recipesbook/pages/ReceiptDescription.dart';
 
 class ProductCard extends StatelessWidget {
   // final Product product;
@@ -34,10 +36,16 @@ class ProductCard extends StatelessWidget {
       alignment: MainAxisAlignment.center,
       children: <Widget>[
         IconButton(
-          icon: Icon(Icons.info),
-          color: Theme.of(context).accentColor,
-          onPressed: () => Navigator.pushNamed<bool>(context, '/product/1'),
-        ),
+            icon: Icon(Icons.info),
+            color: Theme.of(context).accentColor,
+            onPressed: () {
+              Navigator.push(
+                context,
+                CustomRoute<bool>(builder: (context) {
+                  return ProductDescription(_recipe);
+                }),
+              );
+            }),
         IconButton(
           icon: Icon(Icons.favorite_border),
           color: Colors.red,
@@ -53,7 +61,7 @@ class ProductCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Hero(
-            tag: 'image_hero${_recipe.documentId}',
+            tag: _recipe.documentId,
             child: Padding(
               padding: EdgeInsets.all(16.0),
               child: FadeInImage(

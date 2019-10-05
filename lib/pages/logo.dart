@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:recipesbook/data/db_helper.dart';
 import 'package:recipesbook/models/Ingredients.dart';
+import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/services/api.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -61,10 +62,15 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
           var databasePath = await await getDatabasesPath();
           String path = databasePath + "/demo.db";
           await provider.open(path);
-          var hasIngredients = (await provider.getIngredients()).length > 0;
-          if (!hasIngredients) {
-            List<Ingredients> ingredients = await Api.getIngredinets();
+          int ingredientsLength = (await provider.getIngredients()).length;
+          List<Ingredients> ingredients = await Api.getIngredinets();
+          List<Metrics> metrics = await Api.getMetrics();
+          int metricsLength = (await provider.getIngredients()).length;
+          if (ingredients.length>ingredientsLength) {
             provider.insertIngredients(ingredients);
+          }
+          if (metrics.length<metricsLength){
+            provider.insertMetrics(metrics);
           }
 
           Navigator.pushReplacementNamed(context, '/auth');

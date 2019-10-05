@@ -1,11 +1,11 @@
 import 'package:recipesbook/models/steps.dart';
+import 'package:recipesbook/models/webData.dart';
 
-class Recipes {
+class Recipes extends WebData {
   String content;
   String title;
-  int id;
   String image;
-  String documentId;
+  List<String> ingredients;
   List<Steps> steps;
 
   Map<String, dynamic> toMap() {
@@ -14,8 +14,18 @@ class Recipes {
     map['content'] = content;
     map['title'] = title;
     map['image'] = image;
+    map['_id'] = super.id;
 
     return map;
+  }
+
+  Map<String, dynamic> toMapSave(){
+    Map<String, dynamic> map = new Map();
+
+    map['content'] = content;
+    map['title'] = title;
+    map['image'] = image;
+    map['documentId'] = documentId;
   }
 
   Recipes();
@@ -24,6 +34,12 @@ class Recipes {
     content = map['content'];
     title = map['title'];
     image = map['image'];
-    // id = int.parse(map['id']);
+    id = int.parse(map['_id']);
+  }
+
+  Recipes.fromJson(Map<String, dynamic> map) {
+    content = map['content'];
+    title = map['title'];
+    image = map['image'];
   }
 }

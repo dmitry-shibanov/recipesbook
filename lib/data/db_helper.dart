@@ -1,4 +1,5 @@
 import 'package:recipesbook/models/Ingredients.dart';
+import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 import 'package:sqflite/sqflite.dart';
@@ -9,9 +10,13 @@ final String tableSteps = 'steps';
 final String tableIngredients = 'ingredients';
 final String tableUser = 'user';
 final String tableRecipeIngredient = 'recipeingredient';
+final String tableIngredientType = "metrics";
 
 final String columnId = '_id';
 final String columnTitle = 'title';
+final String ingredientCount = "count";
+final String columnName = "name";
+final String columnMetric = "metric";
 final String columnContent = 'content';
 final String columnImage = 'image';
 final String columnRecipeSteps = 'stepsrecipe';
@@ -29,7 +34,7 @@ class DatabaseProvider {
   DatabaseProvider._internal();
 
   Future open(String path) async {
-    _db = await openDatabase(path, version: 3,
+    _db = await openDatabase(path, version: 4,
         onCreate: (Database db, int version) async {
       await db.execute('''
 create table $tableRecipes ( 
@@ -56,17 +61,29 @@ create table $tableIngredients (
       create table $tableRecipeIngredient (
         $columnId integer primary key autoincrement,
         $columnRecipe integer not null,
-        $columnIngredient integer not null)
-      )
+        $columnIngredient integer not null,
+        $columnMetric integer not null,
+        $ingredientCount integer not null)
       ''');
+
+      await db.execute('''
+create table $tableIngredientType ( 
+  $columnId integer primary key autoincrement, 
+  $columnName text not null)
+''');
     });
   }
 
   Future<void> insertIngredients(List<Ingredients> ingredients) async {
-    ingredients.forEach((item) async =>await _db.insert(tableIngredients, item.toMapSave()));
+    ingredients.forEach(
+        (item) async => await _db.insert(tableIngredients, item.toMapSave()));
   }
 
-  Future<void> _insertRecipeIngredient(List<Ingredients> ingredients, int id){
+  void insertMetrics(List<Metrics> metrics){
+    metrics.forEach((item) async => await _db.insert(tableIngredientType, item.toMap()));
+  }
+
+  Future<void> _insertRecipeIngredient(List<Ingredients> ingredients, int id) {
     ingredients.forEach((item) async {
       var map = new Map();
       map[columnRecipe] = id;
@@ -91,6 +108,17 @@ create table $tableIngredients (
             })
             .values
             .toList());
+  }
+
+  void _insertIngredientToRecipe(List<Ingredients> ingredints, int id){
+    ingredints.forEach((item){
+      Map<String,dynamic> map = new Map();
+      map[columnRecipe] = id;
+      map[columnIngredient] = item.id;
+      map[columnMetric] = item.metric.id;
+      map[ingredientCount] = item.count;
+      _db.insert(tableRecipeIngredient, map);
+    });
   }
 
   Future<Recipes> getRecipe(int id) async {

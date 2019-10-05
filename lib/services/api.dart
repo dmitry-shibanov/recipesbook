@@ -8,9 +8,11 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/models/Ingredients.dart';
+import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 
+// https://stackoverflow.com/questions/49241477/how-can-i-populate-the-reference-field-using-firestore
 enum AuthVariant { Anonymously, GoogleSingIn, EmailPassword, NotAuth }
 
 class Api {
@@ -20,18 +22,24 @@ class Api {
   FirebaseUser firebaseUser;
 
   static Future<List<Recipes>> getRecipes() async {
+    
     List<Recipes> recipes = [];
-    (await Firestore.instance.collection('recipes').getDocuments())
+    // List<DocumentSnapshot> docs =
+    //     (await Firestore.instance.collection('recipes').getDocuments())
+    //         .documents;
+   (await Firestore.instance.collection('recipes').getDocuments())
         .documents
-        .map((item) {
-      var recipe = Recipes.fromMap(item.data);
+        .forEach((item) async {
+      var recipe = Recipes.fromJson(item.data);
       recipe.documentId = item.documentID;
-      recipes.add(Recipes.fromMap(item.data));
+      recipe.steps = await Api.getSteps(item.data['steps'].path);
+      recipes.add(recipe);
     });
+
     return recipes;
   }
 
-    Future<File> _saveToTemporaryDirectory(String name) async {
+  Future<File> _saveToTemporaryDirectory(String name) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     print(androidInfo.hardware);
@@ -51,13 +59,29 @@ class Api {
   }
 
   static Future<List<Ingredients>> getIngredinets() async {
-    List<Ingredients> ingredients = (await Firestore.instance.collection('ingredients').getDocuments()).documents.map((item){
+    List<Ingredients> ingredients =
+        (await Firestore.instance.collection('ingredients').getDocuments())
+            .documents
+            .map((item) {
       print(item);
       var ingredient = Ingredients.fromJson(item.data);
       return ingredient;
     }).toList();
 
     return ingredients;
+  }
+
+    static Future<List<Metrics>> getMetrics() async {
+    List<Metrics> metrics =
+        (await Firestore.instance.collection('metrics').getDocuments())
+            .documents
+            .map((item) {
+      print(item);
+      var metric = Metrics.fromJson(item.data);
+      return metric;
+    }).toList();
+    
+    return metrics;
   }
 
   static Future<List<Steps>> getSteps(String path) async {
