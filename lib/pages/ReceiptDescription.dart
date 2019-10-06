@@ -3,6 +3,7 @@ import 'package:flutter/semantics.dart';
 import 'dart:math' as math;
 
 import 'package:recipesbook/models/recipes.dart';
+import 'package:recipesbook/services/api.dart';
 
 class ProductDescription extends StatefulWidget {
   Recipes recipe;
@@ -28,10 +29,19 @@ class ProductDescriptionState extends State<ProductDescription>
     super.initState();
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(slivers: <Widget>[
+      body: FutureBuilder(
+        future: Api.getSteps(widget.recipe.path),
+        builder: (context,projectSnap){
+          if(!projectSnap.hasData){
+            return Center(child: CircularProgressIndicator());
+          }else{
+            widget.recipe.steps = projectSnap.data;
+            return CustomScrollView(slivers: <Widget>[
         SliverAppBar(
           expandedHeight: 256,
           pinned: true,
@@ -81,7 +91,10 @@ class ProductDescriptionState extends State<ProductDescription>
             SizedBox(height: MediaQuery.of(context).size.height/12,)
           ]),
         )
-      ]),
+      ]);
+          }
+        },
+      ),
       floatingActionButton: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[

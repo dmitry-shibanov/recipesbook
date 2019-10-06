@@ -21,6 +21,8 @@ class Api {
 
   FirebaseUser firebaseUser;
 
+  static Future<FirebaseUser> get currentUser async => _auth.currentUser();
+
   static Future<List<Recipes>> getRecipes() async {
     
     List<Recipes> recipes = [];
@@ -32,7 +34,8 @@ class Api {
         .forEach((item) async {
       var recipe = Recipes.fromJson(item.data);
       recipe.documentId = item.documentID;
-      recipe.steps = await Api.getSteps(item.data['steps'].path);
+      recipe.path = item.data['steps'].path;
+      // recipe.steps = await Api.getSteps(item.data['steps'].path);
       recipes.add(recipe);
     });
 
@@ -144,6 +147,10 @@ class Api {
     _googleSignIn.signOut();
   }
 
+  static Future<void> signOut(){
+    return _auth.signOut();
+  }
+
   static Future<void> signInWithGoogle() async {
     GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
@@ -159,4 +166,32 @@ class Api {
     final FirebaseUser currentUser = await _auth.currentUser();
     currentUser.delete();
   }
+
+static Future<FirebaseUser> handleSignInEmail(String email, String password) async {
+
+    AuthResult result = await _auth.signInWithEmailAndPassword(email: email, password: password);
+    final FirebaseUser user = result.user;
+
+    if (user == null || await user.getIdToken() == null){
+      return null;
+    }
+
+    final FirebaseUser currentUser = await _auth.currentUser();
+    
+    return user;
+
+  }
+
+static Future<FirebaseUser> handleSignUp(email, password) async {
+
+    AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+    final FirebaseUser user = result.user;
+
+    if (user == null || await user.getIdToken() == null){
+      return null;
+    }
+
+    return user;
+
+  } 
 }

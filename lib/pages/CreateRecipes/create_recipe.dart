@@ -82,6 +82,131 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
     });
   }
 
+  bool isNumeric(String s) {
+    if (s == null) {
+      return false;
+    }
+
+    // TODO according to DartDoc num.parse() includes both (double.parse and int.parse)
+    return double.parse(s, (e) => null) != null ||
+        int.parse(s, onError: (e) => null) != null;
+  }
+
+  Future<List> showMyDialog(BuildContext context) {
+    String _ingredient;
+    String _type;
+    double _count;
+    GlobalKey<FormState> key = new GlobalKey();
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Новый ингредиент'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Отмена'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('Подтвердить'),
+                onPressed: () {
+                  if (!key.currentState.validate()) {
+                    return;
+                  }
+                  key.currentState.save();
+                  Navigator.pop(context, [_ingredient, _type, _count]);
+                },
+              )
+            ],
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            content: Container(
+              width: 190.0,
+              height: MediaQuery.of(context).size.height / 3,
+              child: Center(
+                child: Form(
+                    key: key,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        TextFormField(
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            hintText: "Введите ингредиент",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                    MediaQuery.of(context).size.height / 2),
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value == null || value.isEmpty) {
+                              return "Введите ингредиент";
+                            }
+                          },
+                          onSaved: (String value) {
+                            _ingredient = value;
+                          },
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          keyboardType: TextInputType.text,
+                          decoration: InputDecoration(
+                            hintText: "Введите тип (гр, л, шт итд)",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                    MediaQuery.of(context).size.height / 2),
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value == null || value.isEmpty) {
+                              return "Введите тип";
+                            }
+                          },
+                          onSaved: (String value) {
+                            _type = value;
+                          },
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        TextFormField(
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: "Введите количество",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(
+                                    MediaQuery.of(context).size.height / 2),
+                              ),
+                            ),
+                          ),
+                          validator: (String value) {
+                            if (value == null ||
+                                value.isEmpty ||
+                                !isNumeric(value)) {
+                              return "Введите число";
+                            }
+                          },
+                          onSaved: (String value) {
+                            _count = double.parse(value);
+                          },
+                        ),
+                      ],
+                    )),
+              ),
+            ),
+          );
+        });
+  }
+
   submitForm() async {
     if (!_globalKey.currentState.validate()) {
       return;
@@ -100,13 +225,20 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
     // Navigator.pushReplacementNamed(context, '/main');
   }
 
-  Widget _buildIngredients(BuildContext context, int index){
+  Widget _buildIngredients(BuildContext context, int index) {
     return Row(
       // key: Key(_recipeIngredient[index].id.toString()),
       children: <Widget>[
-      Expanded(flex: 1,child: Text(_recipeIngredient[index].count),),
-      Expanded(flex: 2,child: Text(_recipeIngredient[index].title),)
-    ],);
+        Expanded(
+          flex: 1,
+          child: Text(_recipeIngredient[index].count),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(_recipeIngredient[index].title),
+        )
+      ],
+    );
   }
 
   @override
@@ -138,75 +270,13 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                 itemCount: _recipeIngredient.length,
               ),
               Divider(),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(left: 8.0),
-                      child: TextField(
-                        onChanged: (String value) {
-                          _productCount = value;
-                        },
-                      ),
-                    ),
-                    flex: 1,
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: FutureBuilder<List<Ingredients>>(
-                      future: load_ingredients(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<List<Ingredients>> list) {
-                        if (!list.hasData) {
-                          return Text('Идет загрузка');
-                        }
-
-                        String _value = list.data[0].title;
-                        return Container(
-                          margin: EdgeInsets.symmetric(
-                            horizontal: 8.0,
-                          ),
-                          child: DropdownButton<String>(
-                            value: _value,
-                            icon: Icon(Icons.arrow_downward),
-                            iconSize: 24,
-                            elevation: 16,
-                            isExpanded: true,
-                            style: TextStyle(color: Colors.deepPurple),
-                            underline: Container(
-                              height: 2,
-                              color: Colors.deepPurpleAccent,
-                            ),
-                            onChanged: (value) {
-                              setState(() {
-                                _value = value;
-                                newIngredient = new Ingredients();
-                                newIngredient.title = value;
-                                newIngredient.count = _productCount;
-                              });
-                            },
-                            items: list.data.map<DropdownMenuItem<String>>(
-                                (Ingredients value) {
-                              return DropdownMenuItem<String>(
-                                value: value.title,
-                                child: Text(value.title),
-                              );
-                            }).toList(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: IconButton(
-                      icon: Icon(Icons.check),
-                      onPressed: () {
-                        _recipeIngredient.add(newIngredient);
-                      },
-                    ),
-                  )
-                ],
+              FlatButton(
+                child: Text('Добавить ингредиент'),
+                onPressed: () async {
+                  var intputs = await showMyDialog(context);
+                  print(intputs[0]);
+                  print(intputs[1]);
+                },
               ),
               Divider(),
               GestureDetector(

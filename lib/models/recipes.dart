@@ -7,6 +7,12 @@ class Recipes extends WebData {
   String image;
   List<String> ingredients;
   List<Steps> steps;
+  String _path;
+
+  String get path => _path;
+  void set path(String my_path){
+    _path = my_path;
+  }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = new Map();

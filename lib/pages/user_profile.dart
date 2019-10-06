@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:recipesbook/services/api.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProfile extends StatefulWidget {
   @override
@@ -15,7 +18,9 @@ class UserProfileState extends State<UserProfile> {
   bool _stayLogin = true;
 
   Widget _buildEmailTextField() {
+    Api.currentUser.then((user) => _login = user.email);
     return TextFormField(
+      initialValue: _login,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
           labelText: 'Login', filled: true, fillColor: Colors.transparent),
@@ -32,22 +37,22 @@ class UserProfileState extends State<UserProfile> {
     );
   }
 
-  Widget _buildPasswordTextField() {
-    return TextFormField(
-      keyboardType: TextInputType.text,
-      obscureText: true,
-      decoration: InputDecoration(
-          labelText: 'password', filled: true, fillColor: Colors.transparent),
-      validator: (String value) {
-        if (value.isEmpty || value.length < 10) {
-          return 'The password should be more than 10 characters';
-        }
-      },
-      onSaved: (String text) {
-        _password = text;
-      },
-    );
-  }
+  // Widget _buildPasswordTextField() {
+  //   return TextFormField(
+  //     keyboardType: TextInputType.text,
+  //     obscureText: true,
+  //     decoration: InputDecoration(
+  //         labelText: 'password', filled: true, fillColor: Colors.transparent),
+  //     validator: (String value) {
+  //       if (value.isEmpty || value.length < 10) {
+  //         return 'The password should be more than 10 characters';
+  //       }
+  //     },
+  //     onSaved: (String text) {
+  //       _password = text;
+  //     },
+  //   );
+  // }
 
   void submitForm() {
     if (!_globalKey.currentState.validate()) {
@@ -56,36 +61,45 @@ class UserProfileState extends State<UserProfile> {
     _globalKey.currentState.save();
   }
 
+
+
   showMyDialog(BuildContext context) {
-  showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Удалить аккаунт ?'),
-          actions: <Widget>[
-            FlatButton(
-              child: Text('Отмена'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Удалить аккаунт ?'),
+            actions: <Widget>[
+              FlatButton(
+                child: Text('Отмена'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              FlatButton(
+                child: Text('Подтвердить'),
+                onPressed: () async {
+                  FirebaseUser user = await Api.currentUser;
+                  await user.delete();
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      '/auth', (Route<dynamic> route) => false);
+                  // Navigator.pop(context);
+                },
+              )
+            ],
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            content: Container(
+              width: 190.0,
+              height: 130.0,
+              child: Center(
+                child: Text(
+                    'Вы действительно хотите удалить аккаунт, все ваши рецепты будут удалены ?'),
+              ),
             ),
-            FlatButton(
-              child: Text('Подтвердить'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            )
-          ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          content: Container(
-            width: 190.0,
-            height: 130.0,
-            child: Center(child: Text('Вы действительно хотите удалить аккаунт, все ваши рецепты будут удалены ?'),),
-          ),
-        );
-      });
-}
+          );
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,27 +118,38 @@ class UserProfileState extends State<UserProfile> {
                 children: <Widget>[
                   _buildEmailTextField(),
                   SizedBox(height: 10.0),
-                  _buildPasswordTextField(),
+                  // _buildPasswordTextField(),
+                  // SizedBox(height: 10.0),
+                  // SwitchListTile(
+                  //     secondary: Icon(Icons.mail_outline),
+                  //     title: Text('Оповещения'),
+                  //     value: _notifications,
+                  //     onChanged: (value) {
+                  //       setState(() {
+                  //         _notifications = value;
+                  //       });
+                  //     }),
                   SizedBox(height: 10.0),
-                  SwitchListTile(
-                      secondary: Icon(Icons.mail_outline),
-                      title: Text('Оповещения'),
-                      value: _notifications,
-                      onChanged: (value) {
-                        setState(() {
-                          _notifications = value;
-                        });
-                      }),
-                  SizedBox(height: 10.0),
-                  SwitchListTile(
+                  FutureBuilder(
+                    future: SharedPreferences.getInstance(),
+                    builder: (context,dataSnapshot){
+                      if(!dataSnapshot.hasData){
+                        return Text("Loading");
+                      }else{
+                        return SwitchListTile(
                       secondary: Icon(Icons.verified_user),
                       title: Text('Оставаться в системе'),
-                      value: _stayLogin,
+                      value: (dataSnapshot.data as SharedPreferences).getBool("result")??true,
                       onChanged: (value) {
                         setState(() {
+                          (dataSnapshot.data as SharedPreferences).setBool("result", value);
                           _stayLogin = value;
                         });
-                      }),
+                      });
+                      }
+                    },
+                  ),
+
                   SizedBox(height: 10.0),
                   ListTile(
                       title: Center(
@@ -135,7 +160,7 @@ class UserProfileState extends State<UserProfile> {
                           ),
                         ),
                       ),
-                      onTap: () =>showMyDialog(context)),
+                      onTap: () => showMyDialog(context)),
                   SizedBox(height: 10.0),
                   ButtonTheme(
                     minWidth: MediaQuery.of(context).size.width / 2,

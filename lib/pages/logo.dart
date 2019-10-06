@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recipesbook/data/db_helper.dart';
 import 'package:recipesbook/models/Ingredients.dart';
@@ -62,18 +63,22 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
           var databasePath = await await getDatabasesPath();
           String path = databasePath + "/demo.db";
           await provider.open(path);
-          int ingredientsLength = (await provider.getIngredients()).length;
-          List<Ingredients> ingredients = await Api.getIngredinets();
-          List<Metrics> metrics = await Api.getMetrics();
-          int metricsLength = (await provider.getIngredients()).length;
-          if (ingredients.length>ingredientsLength) {
-            provider.insertIngredients(ingredients);
+          // int ingredientsLength = (await provider.getIngredients()).length;
+          // List<Ingredients> ingredients = await Api.getIngredinets();
+          // List<Metrics> metrics = await Api.getMetrics();
+          // int metricsLength = (await provider.getIngredients()).length;
+          // if (ingredients.length>ingredientsLength) {
+          //   provider.insertIngredients(ingredients);
+          // }
+          // if (metrics.length<metricsLength){
+          //   provider.insertMetrics(metrics);
+          // }
+          FirebaseUser user = await Api.currentUser;
+          if (user == null && user.getIdToken() == null) {
+            Navigator.pushReplacementNamed(context, '/auth');
+          } else {
+            Navigator.pushReplacementNamed(context, '/main');
           }
-          if (metrics.length<metricsLength){
-            provider.insertMetrics(metrics);
-          }
-
-          Navigator.pushReplacementNamed(context, '/auth');
         });
         // var subscription = future.asStream().listen(doStuffCallback);
         // subscription.cancel();

@@ -9,6 +9,7 @@ import 'package:recipesbook/pages/products.dart';
 import 'package:recipesbook/pages/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/pages/user_profile.dart';
+import 'package:recipesbook/services/api.dart';
 
 import 'helpers/custom_route.dart';
 
@@ -224,7 +225,8 @@ class _MyHomePageState extends State<MyHomePage>
               ListTile(
                 leading: Icon(Icons.exit_to_app),
                 title: Text('Выход'),
-                onTap: () {
+                onTap: () async {
+                  await Api.signOut();
                   Navigator.of(context).pushNamedAndRemoveUntil(
                       '/auth', (Route<dynamic> route) => false);
                   // Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (context) =>

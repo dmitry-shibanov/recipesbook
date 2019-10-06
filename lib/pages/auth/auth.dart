@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/mixins/validator_mixins.dart';
@@ -35,6 +36,7 @@ class RegesrtationState extends State<Regestration>
   final PermissionHandler _permissionHandler = PermissionHandler();
   AnimationController _controller;
   AuthMode authVariant;
+  FirebaseUser _user;
   Animation<Offset> _animation;
 
   void initState() {
@@ -133,17 +135,23 @@ class RegesrtationState extends State<Regestration>
   }
 
   submitForm() async {
-    double MEGABYTE = 1024.0*1024*1024;
-    print(
-        "Free physical memory    : ${SysInfo.getFreePhysicalMemory() / MEGABYTE} MB");
+    _globalKey.currentState.save();
 
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
     if (!_globalKey.currentState.validate()) {
       return;
     }
-    _globalKey.currentState.save();
-    Navigator.pushReplacementNamed(context, '/main');
+
+    if (authVariant == AuthMode.Login) {
+      _user = await Api.handleSignInEmail(_login, _password);
+    } else {
+      _user = await Api.handleSignUp(_login, _password);
+    }
+    print(_user);
+    if (_user != null) {
+      Navigator.pushReplacementNamed(context, '/main');
+    } else {
+      return;
+    }
   }
 
   @override
