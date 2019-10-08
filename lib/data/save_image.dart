@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io' as Io;
+import 'dart:io';
 import 'package:image/image.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:uuid/uuid.dart';
@@ -28,7 +29,8 @@ class SaveFile {
      Io.File file = new Io.File(path);
      return file;
    }
-
+//https://stackoverflow.com/questions/49455079/flutter-save-a-network-image-to-local-directory/51589008
+//https://stackoverflow.com/questions/54197053/download-file-from-url-save-to-phones-storage
    Future<Io.File> saveImageNetwork(String url) async {
 
     final file = await getImageFromNetwork(url);
@@ -36,11 +38,13 @@ class SaveFile {
     var path = await _localPath;
     Image image = decodeImage(file.readAsBytesSync());
 
-    Image thumbnail = copyResize(image);
+    Image thumbnail = copyResize(image,height: 100,width: 100);
     Io.Directory dir = await createDirectory();
     // Save the thumbnail as a PNG.
-    return new Io.File('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
-      ..writeAsBytesSync(encodePng(thumbnail));
+    Future<File> f = file.copy('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png');
+    return f;
+    // return new Io.File('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
+    //   ..writeAsBytesSync(encodePng(thumbnail));
   }
 
   Future<Io.File> saveImageLocal(String path) async {

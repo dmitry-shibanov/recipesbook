@@ -87,7 +87,6 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
       return false;
     }
 
-    // TODO according to DartDoc num.parse() includes both (double.parse and int.parse)
     return double.parse(s, (e) => null) != null ||
         int.parse(s, onError: (e) => null) != null;
   }
@@ -106,7 +105,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
               FlatButton(
                 child: Text('Отмена'),
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context, []);
                 },
               ),
               FlatButton(
@@ -116,7 +115,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                     return;
                   }
                   key.currentState.save();
-                  Navigator.pop(context, [_ingredient, _type, _count]);
+                  Navigator.pop(context, [_ingredient, _type, _count.toString()]);
                 },
               )
             ],
@@ -227,15 +226,16 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
 
   Widget _buildIngredients(BuildContext context, int index) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       // key: Key(_recipeIngredient[index].id.toString()),
       children: <Widget>[
         Expanded(
           flex: 1,
-          child: Text(_recipeIngredient[index].count),
+          child: Text("${_recipeIngredient[index].count} ${_recipeIngredient[index].metric}",textAlign: TextAlign.start,),
         ),
         Expanded(
           flex: 2,
-          child: Text(_recipeIngredient[index].title),
+          child: Text(_recipeIngredient[index].title,textAlign: TextAlign.end,),
         )
       ],
     );
@@ -273,9 +273,15 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
               FlatButton(
                 child: Text('Добавить ингредиент'),
                 onPressed: () async {
-                  var intputs = await showMyDialog(context);
-                  print(intputs[0]);
-                  print(intputs[1]);
+                  var inputs = await showMyDialog(context);
+                  if(inputs.length>0){
+                    Map<String,dynamic> map = new Map();
+                    map['name'] = inputs[0];
+                    var ingredient = new Ingredients.fromJson(map);
+                    ingredient.count = inputs[2];
+                    ingredient.metric = inputs[1];
+                    _recipeIngredient.add(ingredient);
+                  }
                 },
               ),
               Divider(),

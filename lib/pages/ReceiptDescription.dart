@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:recipesbook/data/db_helper.dart';
 import 'dart:math' as math;
 
 import 'package:recipesbook/models/recipes.dart';
@@ -46,7 +47,8 @@ class ProductDescriptionState extends State<ProductDescription>
           expandedHeight: 256,
           pinned: true,
           flexibleSpace: FlexibleSpaceBar(
-            title: Text('Our recipe'),
+            title: Text(widget.recipe.title,
+            overflow: TextOverflow.ellipsis,),
             background: Hero(
               tag: widget.recipe.documentId,
               child: FadeInImage(
@@ -133,7 +135,10 @@ class ProductDescriptionState extends State<ProductDescription>
                   Icons.save,
                   color: Theme.of(context).primaryColor,
                 ),
-                onPressed: () => null,
+                onPressed: (){
+                  DatabaseProvider provider = new DatabaseProvider();
+                  provider.insert(widget.recipe);
+                },
               ),
             ),
           ),

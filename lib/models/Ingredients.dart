@@ -4,11 +4,11 @@ import 'package:recipesbook/models/webData.dart';
 class Ingredients extends WebData {
   String _title;
   String _count;
-  Metrics _metric;
+  String _metric;
 
   String get count => _count;
   String get title => _title;
-  Metrics get metric => _metric;
+  String get metric => _metric;
 
   void set count(String cou) {
     if (cou.trim().isEmpty || cou == null) {
@@ -19,13 +19,13 @@ class Ingredients extends WebData {
     }
   }
 
-  void set metric(Metrics metrics) {
-    if (metrics!=null && metrics.name != null && !metrics.name.trim().isEmpty) {
-      throw ArgumentError.value(metrics, "Неверный аргумент",
-          "metrics не может быть пустым или равным null");
-    } else {
+  void set metric(String metrics) {
+    // if (metrics!=null && metrics.name != null && !metrics.name.trim().isEmpty) {
+    //   throw ArgumentError.value(metrics, "Неверный аргумент",
+    //       "metrics не может быть пустым или равным null");
+    // } else {
       _metric = metrics;
-    }
+    // }
   }
 
   void set title(String name) {

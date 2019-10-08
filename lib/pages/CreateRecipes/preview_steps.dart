@@ -140,15 +140,15 @@ class PreviewStepsState extends State<PreviewSteps> {
               setState(() {});
             },
           ),
-          RaisedButton(
-            color: Colors.white,
-            onPressed: () {},
-            child: Text('Сохрнаить рецепт'),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                  Radius.circular(MediaQuery.of(this.context).size.height / 2)),
-            ),
-          ),
+          // RaisedButton(
+          //   color: Colors.white,
+          //   onPressed: () {},
+          //   child: Text('Сохрнаить рецепт'),
+          //   shape: RoundedRectangleBorder(
+          //     borderRadius: BorderRadius.all(
+          //         Radius.circular(MediaQuery.of(context).size.height / 2)),
+          //   ),
+          // ),
         ],
       ),
     );

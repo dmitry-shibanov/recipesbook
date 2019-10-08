@@ -74,7 +74,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
           //   provider.insertMetrics(metrics);
           // }
           FirebaseUser user = await Api.currentUser;
-          if (user == null && user.getIdToken() == null) {
+          if (user == null || user.getIdToken() == null) {
             Navigator.pushReplacementNamed(context, '/auth');
           } else {
             Navigator.pushReplacementNamed(context, '/main');

@@ -1,3 +1,4 @@
+import 'package:recipesbook/data/save_image.dart';
 import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/models/recipes.dart';
@@ -22,6 +23,7 @@ final String columnImage = 'image';
 final String columnRecipeSteps = 'stepsrecipe';
 final String columnRecipe = "recipe";
 final String columnIngredient = "ingredient";
+final String columnDocumentId = "documentId";
 
 class DatabaseProvider {
   Database _db;
@@ -38,7 +40,8 @@ class DatabaseProvider {
         onCreate: (Database db, int version) async {
       await db.execute('''
 create table $tableRecipes ( 
-  $columnId integer primary key autoincrement, 
+  $columnId integer primary key autoincrement,
+  $columnDocumentId text not null, 
   $columnTitle text not null,
   $columnContent text not null,
   $columnImage text not null)
@@ -93,8 +96,10 @@ create table $tableIngredientType (
   }
 
   Future<Recipes> insert(Recipes recipe) async {
-    recipe.id = await _db.insert(tableRecipes, recipe.toMap());
-    await _insertSteps(recipe.steps, recipe.id);
+    // recipe.id = await _db.insert(tableRecipes, recipe.toMapSave());
+    var saveFileInstance = SaveFile(recipe);
+    saveFileInstance.saveImageNetwork(recipe.image);
+    // await _insertSteps(recipe.steps, recipe.id);
     return recipe;
   }
 
@@ -115,7 +120,7 @@ create table $tableIngredientType (
       Map<String,dynamic> map = new Map();
       map[columnRecipe] = id;
       map[columnIngredient] = item.id;
-      map[columnMetric] = item.metric.id;
+      // map[columnMetric] = item.metric.id;
       map[ingredientCount] = item.count;
       _db.insert(tableRecipeIngredient, map);
     });
