@@ -11,7 +11,8 @@ class SaveFile {
 
   Recipes recipe;
   
-  SaveFile(this.recipe);
+  // SaveFile(this.recipe);
+
 
   Future<String> get _localPath async {
     final directory = await getApplicationDocumentsDirectory();
@@ -31,21 +32,40 @@ class SaveFile {
    }
 //https://stackoverflow.com/questions/49455079/flutter-save-a-network-image-to-local-directory/51589008
 //https://stackoverflow.com/questions/54197053/download-file-from-url-save-to-phones-storage
-   Future<Io.File> saveImageNetwork(String url) async {
+   Future<String> saveImageNetwork(String url,String name,[String stepsFolder = ""]) async {
 
     final file = await getImageFromNetwork(url);
     //retrieve local path for device
-    var path = await _localPath;
-    Image image = decodeImage(file.readAsBytesSync());
+    // var path = await _localPath;
+    // Image image = decodeImage(file.readAsBytesSync());
 
-    Image thumbnail = copyResize(image,height: 100,width: 100);
+    // Image thumbnail = copyResize(image,height: 100,width: 100);
     Io.Directory dir = await createDirectory();
+    // String imageName = stepsFolder.isEmpty ? DateTime.now().toUtc().toIso8601String():
     // Save the thumbnail as a PNG.
-    Future<File> f = file.copy('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png');
-    return f;
+    File f = await file.copy("${dir.path}${stepsFolder.isEmpty?'':'/steps'}/$name.png");
+    
+    return f.path;
     // return new Io.File('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
     //   ..writeAsBytesSync(encodePng(thumbnail));
   }
+
+  //    Future<Io.File> saveImageNetwork(String url,String name,[String stepsFolder = ""]) async {
+
+  //   final file = await getImageFromNetwork(url);
+  //   //retrieve local path for device
+  //   // var path = await _localPath;
+  //   // Image image = decodeImage(file.readAsBytesSync());
+
+  //   // Image thumbnail = copyResize(image,height: 100,width: 100);
+  //   Io.Directory dir = await createDirectory();
+  //   // String imageName = stepsFolder.isEmpty ? DateTime.now().toUtc().toIso8601String():
+  //   // Save the thumbnail as a PNG.
+  //   Future<File> f = file.copy("${dir.path}${stepsFolder.isEmpty?'':'/steps'}/$name.png");
+  //   return f;
+  //   // return new Io.File('${dir.path}/${DateTime.now().toUtc().toIso8601String()}.png')
+  //   //   ..writeAsBytesSync(encodePng(thumbnail));
+  // }
 
   Future<Io.File> saveImageLocal(String path) async {
     var path = await _localPath;

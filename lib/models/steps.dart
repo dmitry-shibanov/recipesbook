@@ -7,6 +7,15 @@ class Steps {
     Map<String, dynamic> map = new Map();
     map['content'] = content;
     map['image'] = image;
+    map['_id'] = id;
+
+    return map;
+  }
+
+  Map<String,dynamic> toMapSave(){
+    Map<String, dynamic> map = new Map();
+    map['content'] = content;
+    map['image'] = image;
 
     return map;
   }

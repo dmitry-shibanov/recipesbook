@@ -1,6 +1,5 @@
 import 'package:recipesbook/data/save_image.dart';
 import 'package:recipesbook/models/Ingredients.dart';
-import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 import 'package:sqflite/sqflite.dart';
@@ -10,17 +9,17 @@ final String tableRecipes = 'recipes';
 final String tableSteps = 'steps';
 final String tableIngredients = 'ingredients';
 final String tableUser = 'user';
-final String tableRecipeIngredient = 'recipeingredient';
-final String tableIngredientType = "metrics";
 
 final String columnId = '_id';
 final String columnTitle = 'title';
 final String ingredientCount = "count";
 final String columnName = "name";
+final String columnDate = "date";
 final String columnMetric = "metric";
 final String columnContent = 'content';
 final String columnImage = 'image';
 final String columnRecipeSteps = 'stepsrecipe';
+final String columnRecipeIngredient = "recipeingredient";
 final String columnRecipe = "recipe";
 final String columnIngredient = "ingredient";
 final String columnDocumentId = "documentId";
@@ -41,9 +40,10 @@ class DatabaseProvider {
       await db.execute('''
 create table $tableRecipes ( 
   $columnId integer primary key autoincrement,
-  $columnDocumentId text not null, 
+  $columnDocumentId text, 
   $columnTitle text not null,
   $columnContent text not null,
+  $columnDate text not null,
   $columnImage text not null)
 ''');
 
@@ -58,22 +58,13 @@ create table $tableSteps (
       await db.execute('''
 create table $tableIngredients ( 
   $columnId integer primary key autoincrement, 
-  $columnTitle text not null)
+  $columnTitle text not null,
+  $columnName text not null,
+  $ingredientCount text not null,
+  $columnRecipeIngredient text not null
+  )
 ''');
-      await db.execute('''
-      create table $tableRecipeIngredient (
-        $columnId integer primary key autoincrement,
-        $columnRecipe integer not null,
-        $columnIngredient integer not null,
-        $columnMetric integer not null,
-        $ingredientCount integer not null)
-      ''');
 
-      await db.execute('''
-create table $tableIngredientType ( 
-  $columnId integer primary key autoincrement, 
-  $columnName text not null)
-''');
     });
   }
 
@@ -82,47 +73,20 @@ create table $tableIngredientType (
         (item) async => await _db.insert(tableIngredients, item.toMapSave()));
   }
 
-  void insertMetrics(List<Metrics> metrics){
-    metrics.forEach((item) async => await _db.insert(tableIngredientType, item.toMap()));
-  }
-
-  Future<void> _insertRecipeIngredient(List<Ingredients> ingredients, int id) {
-    ingredients.forEach((item) async {
-      var map = new Map();
-      map[columnRecipe] = id;
-      map[columnIngredient] = item.id;
-      await _db.insert(tableRecipeIngredient, map);
-    });
-  }
-
   Future<Recipes> insert(Recipes recipe) async {
-    // recipe.id = await _db.insert(tableRecipes, recipe.toMapSave());
-    var saveFileInstance = SaveFile(recipe);
-    saveFileInstance.saveImageNetwork(recipe.image);
-    // await _insertSteps(recipe.steps, recipe.id);
+    var saveFileInstance = SaveFile();
+    recipe.image = await saveFileInstance.saveImageNetwork(recipe.image,"p0");
+    recipe.id = await _db.insert(tableRecipes, recipe.toMapSave());
+    // saveFileInstance.saveImageNetwork(recipe.image,"p0");
+    await _insertSteps(recipe.steps, recipe.id);
     return recipe;
   }
 
   Future<void> _insertSteps(List<Steps> steps, int id) async {
-    await _db.rawInsert(
-        tableSteps,
-        steps
-            .asMap()
-            .map((index, item) {
-              return MapEntry(index, item.toMap());
-            })
-            .values
-            .toList());
-  }
-
-  void _insertIngredientToRecipe(List<Ingredients> ingredints, int id){
-    ingredints.forEach((item){
-      Map<String,dynamic> map = new Map();
-      map[columnRecipe] = id;
-      map[columnIngredient] = item.id;
-      // map[columnMetric] = item.metric.id;
-      map[ingredientCount] = item.count;
-      _db.insert(tableRecipeIngredient, map);
+    steps.asMap().forEach((index, item)async{
+          var saveFileInstance = SaveFile();
+          item.image = await saveFileInstance.saveImageNetwork(item.image,"p${index+1}");
+          item.id = await _db.insert(tableSteps, item.toMapSave());
     });
   }
 
