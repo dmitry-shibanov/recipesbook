@@ -2,6 +2,7 @@ class Steps {
   int id;
   String content;
   String image;
+  String stepsrecipe;
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = new Map();
@@ -16,6 +17,7 @@ class Steps {
     Map<String, dynamic> map = new Map();
     map['content'] = content;
     map['image'] = image;
+    map['stepsrecipe'] = stepsrecipe;
 
     return map;
   }

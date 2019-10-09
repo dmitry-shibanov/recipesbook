@@ -8,7 +8,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/models/Ingredients.dart';
-import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 
@@ -24,12 +23,11 @@ class Api {
   static Future<FirebaseUser> get currentUser async => _auth.currentUser();
 
   static Future<List<Recipes>> getRecipes() async {
-    
     List<Recipes> recipes = [];
     // List<DocumentSnapshot> docs =
     //     (await Firestore.instance.collection('recipes').getDocuments())
     //         .documents;
-   (await Firestore.instance.collection('recipes').getDocuments())
+    (await Firestore.instance.collection('recipes').getDocuments())
         .documents
         .forEach((item) async {
       var recipe = Recipes.fromJson(item.data);
@@ -42,6 +40,7 @@ class Api {
     return recipes;
   }
 
+// save cache images
   Future<File> _saveToTemporaryDirectory(String name) async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
@@ -59,32 +58,6 @@ class Api {
     }
 
     return null;
-  }
-
-  static Future<List<Ingredients>> getIngredinets() async {
-    List<Ingredients> ingredients =
-        (await Firestore.instance.collection('ingredients').getDocuments())
-            .documents
-            .map((item) {
-      print(item);
-      var ingredient = Ingredients.fromJson(item.data);
-      return ingredient;
-    }).toList();
-
-    return ingredients;
-  }
-
-    static Future<List<Metrics>> getMetrics() async {
-    List<Metrics> metrics =
-        (await Firestore.instance.collection('metrics').getDocuments())
-            .documents
-            .map((item) {
-      print(item);
-      var metric = Metrics.fromJson(item.data);
-      return metric;
-    }).toList();
-    
-    return metrics;
   }
 
   static Future<List<Steps>> getSteps(String path) async {
@@ -107,32 +80,42 @@ class Api {
 
     return steps;
   }
+  // https://stackoverflow.com/questions/51857796/flutter-upload-image-to-firebase-storage
+//https://stackoverflow.com/questions/50877398/flutter-load-image-from-firebase-storage
+  // static createRecipe(Recipes recipe) async {
+  static createRecipe(String image) async {
+    // Firestore.instance
+    //                 .collection("users").orderBy(field).where("ingredients",arrayContains: "ingredient")
 
-  static createRecipe(Recipes recipe) async {
     final StorageReference storageRef =
-        FirebaseStorage.instance.ref().child("djsakldals");
+        FirebaseStorage.instance.ref().child("doprot/djsakldals");
 
     final StorageUploadTask uploadTask = storageRef.putFile(
-      File(recipe.image),
+      File(image),
       StorageMetadata(
         contentType: "image" + '/' + "jpeg",
       ),
     );
-
+//https://firebasestorage.googleapis.com/v0/b/flutter-univer-work.appspot.com/o/doprot%2Fdjsakldals?alt=media&token=68809744-ac23-4a5d-b3a3-f315bc6bc9e3
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
-    final String url = (await downloadUrl.ref.getDownloadURL());
-    print('URL Is $url');
+    print(downloadUrl.uploadSessionUri.path);
+    print(downloadUrl.toString());
 
-    Map<String, dynamic> regionData = new Map<String, dynamic>();
-    regionData = recipe.toMap();
+    print(downloadUrl.storageMetadata.path);
 
-    DocumentReference currentRegion =
-        Firestore.instance.collection("region").document("asdhkasdka");
+    // final String url = (await downloadUrl.ref.getDownloadURL());
+    // print('URL Is $url');
 
-    Firestore.instance.runTransaction((transaction) async {
-      await transaction.set(currentRegion, regionData);
-      print("instance created");
-    });
+    // Map<String, dynamic> regionData = new Map<String, dynamic>();
+    // regionData = recipe.toMap();
+
+    // DocumentReference currentRegion =
+    //     Firestore.instance.collection("region").document("asdhkasdka");
+
+    // Firestore.instance.runTransaction((transaction) async {
+    //   await transaction.set(currentRegion, regionData);
+    //   print("instance created");
+    // });
   }
 
   static void signInAnon() async {
@@ -147,7 +130,7 @@ class Api {
     _googleSignIn.signOut();
   }
 
-  static Future<void> signOut(){
+  static Future<void> signOut() {
     return _auth.signOut();
   }
 
@@ -167,31 +150,30 @@ class Api {
     currentUser.delete();
   }
 
-static Future<FirebaseUser> handleSignInEmail(String email, String password) async {
-
-    AuthResult result = await _auth.signInWithEmailAndPassword(email: email, password: password);
+  static Future<FirebaseUser> handleSignInEmail(
+      String email, String password) async {
+    AuthResult result = await _auth.signInWithEmailAndPassword(
+        email: email, password: password);
     final FirebaseUser user = result.user;
 
-    if (user == null || await user.getIdToken() == null){
+    if (user == null || await user.getIdToken() == null) {
       return null;
     }
 
     final FirebaseUser currentUser = await _auth.currentUser();
-    
-    return user;
 
+    return user;
   }
 
-static Future<FirebaseUser> handleSignUp(email, password) async {
-
-    AuthResult result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+  static Future<FirebaseUser> handleSignUp(email, password) async {
+    AuthResult result = await _auth.createUserWithEmailAndPassword(
+        email: email, password: password);
     final FirebaseUser user = result.user;
 
-    if (user == null || await user.getIdToken() == null){
+    if (user == null || await user.getIdToken() == null) {
       return null;
     }
 
     return user;
-
-  } 
+  }
 }

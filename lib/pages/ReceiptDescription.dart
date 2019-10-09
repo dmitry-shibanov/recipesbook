@@ -75,7 +75,12 @@ class ProductDescriptionState extends State<ProductDescription>
               'Ингедиенты',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
-            buildIngredients(),
+            ListView.builder(
+              itemBuilder: _buildIngredients,
+              itemCount: widget.recipe.ingredients.length,
+              shrinkWrap: true,
+              controller: new ScrollController(keepScrollOffset: true),
+            ),
             Text(
               'Шаги',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
@@ -174,25 +179,45 @@ class ProductDescriptionState extends State<ProductDescription>
     );
   }
 
-  Widget buildIngredients() {
+  // Widget buildIngredients() {
+  //   return Container(
+  //     margin: EdgeInsets.all(16.0),
+  //     child: Row(
+  //       children: <Widget>[
+  //         FittedBox(
+  //           child: Text(
+  //             'Гриль',
+  //             textAlign: TextAlign.start,
+  //           ),
+  //         ),
+  //         FittedBox(
+  //           child: Text(
+  //             '12 гр',
+  //             textAlign: TextAlign.end,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
+    Widget _buildIngredients(BuildContext context, int index) {
     return Container(
-      margin: EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(8.0),
       child: Row(
-        children: <Widget>[
-          FittedBox(
-            child: Text(
-              'Гриль',
-              textAlign: TextAlign.start,
-            ),
-          ),
-          FittedBox(
-            child: Text(
-              '12 гр',
-              textAlign: TextAlign.end,
-            ),
-          ),
-        ],
-      ),
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      // key: Key(_recipeIngredient[index].id.toString()),
+      children: <Widget>[
+        Expanded(
+          flex: 1,
+          child: Text("${widget.recipe.ingredients[index].count} ${widget.recipe.ingredients[index].metric}",textAlign: TextAlign.start,),
+        ),
+        Expanded(
+          flex: 2,
+          child: Text(widget.recipe.ingredients[index].title,textAlign: TextAlign.end,),
+        )
+      ],
+    ),
     );
   }
 

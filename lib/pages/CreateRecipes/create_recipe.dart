@@ -6,6 +6,7 @@ import 'package:recipesbook/data/db_helper.dart';
 import 'package:recipesbook/mixins/create_recipe_mixins.dart';
 import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/pages/CreateRecipes/preview_steps.dart';
+import 'package:recipesbook/services/api.dart';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
 
@@ -210,12 +211,13 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
     if (!_globalKey.currentState.validate()) {
       return;
     }
+    // Api.createRecipe(imagesFiles[0].path);
     _globalKey.currentState.save();
     var dir = await getApplicationDocumentsDirectory();
     print(dir.path);
     await _requestPermission(PermissionGroup.storage);
-    // var _db = new DatabaseProvider();
-
+    var _db = new DatabaseProvider();
+    
     Navigator.push(
         context,
         MaterialPageRoute(

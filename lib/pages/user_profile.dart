@@ -80,9 +80,26 @@ class UserProfileState extends State<UserProfile> {
                 child: Text('Подтвердить'),
                 onPressed: () async {
                   FirebaseUser user = await Api.currentUser;
-                  await user.delete();
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      '/auth', (Route<dynamic> route) => false);
+                  print(user.uid);
+                  var userUpdateInfo = new UserUpdateInfo();
+                  userUpdateInfo.photoUrl = "dkaslkadls";
+
+                  // AuthCredential authcr = AuthCredential()
+                  
+                  // user.updatePhoneNumberCredential(credential)
+                  user.updateProfile(userUpdateInfo);
+                  
+                  user.providerData.forEach((item){
+                    print(item.displayName);
+                    print(item.email);
+                    print(item.phoneNumber);
+                    print(item.photoUrl);
+                    print(user.providerData.length);
+
+                  });
+                  // await user.delete();
+                  // Navigator.of(context).pushNamedAndRemoveUntil(
+                  //     '/auth', (Route<dynamic> route) => false);
                   // Navigator.pop(context);
                 },
               )

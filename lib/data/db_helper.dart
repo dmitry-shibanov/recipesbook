@@ -43,7 +43,7 @@ create table $tableRecipes (
   $columnDocumentId text, 
   $columnTitle text not null,
   $columnContent text not null,
-  $columnDate text not null,
+  $columnDate text,
   $columnImage text not null)
 ''');
 
@@ -59,12 +59,11 @@ create table $tableSteps (
 create table $tableIngredients ( 
   $columnId integer primary key autoincrement, 
   $columnTitle text not null,
-  $columnName text not null,
+  $columnMetric text not null,
   $ingredientCount text not null,
   $columnRecipeIngredient text not null
   )
 ''');
-
     });
   }
 
@@ -75,18 +74,28 @@ create table $tableIngredients (
 
   Future<Recipes> insert(Recipes recipe) async {
     var saveFileInstance = SaveFile();
-    recipe.image = await saveFileInstance.saveImageNetwork(recipe.image,"p0");
+    recipe.image = await saveFileInstance.saveImageNetwork(recipe.image, "p0");
     recipe.id = await _db.insert(tableRecipes, recipe.toMapSave());
     // saveFileInstance.saveImageNetwork(recipe.image,"p0");
     await _insertSteps(recipe.steps, recipe.id);
+    await _insertIngredients(recipe.ingredients, recipe.id);
     return recipe;
   }
 
   Future<void> _insertSteps(List<Steps> steps, int id) async {
-    steps.asMap().forEach((index, item)async{
-          var saveFileInstance = SaveFile();
-          item.image = await saveFileInstance.saveImageNetwork(item.image,"p${index+1}");
-          item.id = await _db.insert(tableSteps, item.toMapSave());
+    steps.asMap().forEach((index, item) async {
+      var saveFileInstance = SaveFile();
+      item.stepsrecipe = id.toString();
+      item.image =
+          await saveFileInstance.saveImageNetwork(item.image, "p${index + 1}");
+      item.id = await _db.insert(tableSteps, item.toMapSave());
+    });
+  }
+
+  Future<void> _insertIngredients(List<Ingredients> ingredients, int id) {
+    ingredients.forEach((item) async {
+      item.recipeingredient = id.toString();
+      item.id = await _db.insert(tableSteps, item.toMapSave());
     });
   }
 
@@ -115,6 +124,15 @@ create table $tableIngredients (
       return maps;
     }
     return null;
+  }
+
+  Future<List<Recipes>> getAllRecipes() async {
+    List<Recipes> recipes = (await _db.query(tableRecipes)).map((item) {
+      Recipes recipe = Recipes.fromMap(item);
+      return recipe;
+    }).toList();
+
+    return recipes;
   }
 
   Future<List<Map<String, dynamic>>> getIngredients() async {

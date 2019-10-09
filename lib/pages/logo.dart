@@ -3,8 +3,6 @@ import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:recipesbook/data/db_helper.dart';
-import 'package:recipesbook/models/Ingredients.dart';
-import 'package:recipesbook/models/Metrics.dart';
 import 'package:recipesbook/services/api.dart';
 import 'package:sqflite/sqflite.dart';
 
