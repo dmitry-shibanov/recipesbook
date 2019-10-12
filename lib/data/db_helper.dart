@@ -74,20 +74,23 @@ create table $tableIngredients (
 
   Future<Recipes> insert(Recipes recipe) async {
     var saveFileInstance = SaveFile();
-    recipe.image = await saveFileInstance.saveImageNetwork(recipe.image, "p0");
-    recipe.id = await _db.insert(tableRecipes, recipe.toMapSave());
+    List<String> results =
+        await saveFileInstance.saveImageNetwork(recipe.pathImage, "p0");
+    recipe.image = results[0];
+    String path = results[1];
+    int id = await _db.insert(tableRecipes, recipe.toMapSave());
     // saveFileInstance.saveImageNetwork(recipe.image,"p0");
-    await _insertSteps(recipe.steps, recipe.id);
-    await _insertIngredients(recipe.ingredients, recipe.id);
+    await _insertIngredients(recipe.ingredients, id);
+    await _insertSteps(recipe.steps, path, id);
     return recipe;
   }
 
-  Future<void> _insertSteps(List<Steps> steps, int id) async {
+  Future<void> _insertSteps(List<Steps> steps, String path, int id) async {
     steps.asMap().forEach((index, item) async {
       var saveFileInstance = SaveFile();
       item.stepsrecipe = id.toString();
-      item.image =
-          await saveFileInstance.saveImageNetwork(item.image, "p${index + 1}");
+      item.image = await saveFileInstance.saveImageSteps(
+          item.pathImage, path, "p${index + 1}");
       item.id = await _db.insert(tableSteps, item.toMapSave());
     });
   }

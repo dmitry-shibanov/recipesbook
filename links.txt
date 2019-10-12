@@ -3,7 +3,7 @@ https://stackru.com/questions/49214548/flutter-zagruzka-i-keshirovanie-izobrazhe
 https://stackoverflow.com/questions/49455079/flutter-save-a-network-image-to-local-directory
 https://stackoverflow.com/questions/52299112/flutter-download-an-image-from-url
 https://pub.dev/packages/image_downloader#-readme-tab-
-
+https://medium.com/@ayushpguptaapg/using-streams-in-flutter-62fed41662e4
 final File image = await ImagePicker.pickImage(source: imageSource);
 
 // getting a directory path for saving

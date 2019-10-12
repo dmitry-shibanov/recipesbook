@@ -29,15 +29,6 @@ class ProductsListState extends State {
   }
 
   loadData() async {
-    // List<DocumentSnapshot> docs =
-    //     (await Firestore.instance.collection('recipes').getDocuments())
-    //         .documents;
-
-    // // recipes = await Api.getRecipes();
-    // var recipe = new Recipes.fromJson(docs[0].data);
-    // recipe.documentId = docs[0].documentID;
-    // recipe.steps = await Api.getSteps(docs[0].data['steps'].path);
-    // recipes.add(recipe);
     recipes = await Api.getRecipes();
     if (recipes.length > 0) {
       setState(() {

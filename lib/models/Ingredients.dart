@@ -67,10 +67,10 @@ class Ingredients extends WebData {
     id = map['_id'];
   }
 
-  Ingredients.fromJson(Map<String, dynamic> map) {
+  Ingredients.fromJson(Map<dynamic, dynamic> map) {
     print('came');
-    _title = map['ingredient'];
-    _count = map['count'];
-    _metric = map['metric'];
+    title = map["ingredient"];
+    metric = map["metric"];
+    count = map["count"];
   }
 }
