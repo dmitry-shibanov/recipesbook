@@ -6,7 +6,6 @@ import 'package:recipesbook/data/db_helper.dart';
 import 'package:recipesbook/mixins/create_recipe_mixins.dart';
 import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/pages/CreateRecipes/preview_steps.dart';
-import 'package:recipesbook/services/api.dart';
 import 'dart:io';
 import 'package:uuid/uuid.dart';
 
@@ -30,11 +29,12 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
 
   final List<String> keys = [];
   final List<Map<String, dynamic>> _steps = [];
-  final Map<String, String> _general_desc = {
-    'description_receipt': '',
+  final Map<String, dynamic> _general_desc = {
+    'content': '',
     'title': '',
     'ingredients': '',
-    'time': ''
+    'date': '',
+    'steps': ''
   };
 
   static final _formKey = new GlobalKey<FormState>();
@@ -116,7 +116,8 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                     return;
                   }
                   key.currentState.save();
-                  Navigator.pop(context, [_ingredient, _type, _count.toString()]);
+                  Navigator.pop(
+                      context, [_ingredient, _type, _count.toString()]);
                 },
               )
             ],
@@ -211,19 +212,17 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
     if (!_globalKey.currentState.validate()) {
       return;
     }
-    // Api.createRecipe(imagesFiles[0].path);
     _globalKey.currentState.save();
-    var dir = await getApplicationDocumentsDirectory();
-    print(dir.path);
     await _requestPermission(PermissionGroup.storage);
-    var _db = new DatabaseProvider();
-    
+
+    _general_desc['steps'] = _steps;
+    _general_desc['ingredients'] = _recipeIngredient;
+
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PreviewSteps(_steps),
+          builder: (context) => PreviewSteps(_general_desc),
         ));
-    // Navigator.pushReplacementNamed(context, '/main');
   }
 
   Widget _buildIngredients(BuildContext context, int index) {
@@ -233,11 +232,17 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
       children: <Widget>[
         Expanded(
           flex: 1,
-          child: Text("${_recipeIngredient[index].count} ${_recipeIngredient[index].metric}",textAlign: TextAlign.start,),
+          child: Text(
+            "${_recipeIngredient[index].count} ${_recipeIngredient[index].metric}",
+            textAlign: TextAlign.start,
+          ),
         ),
         Expanded(
           flex: 2,
-          child: Text(_recipeIngredient[index].title,textAlign: TextAlign.end,),
+          child: Text(
+            _recipeIngredient[index].title,
+            textAlign: TextAlign.end,
+          ),
         )
       ],
     );
@@ -262,7 +267,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
               _CreateRow(
                   'Введите заголовок', _general_desc['title'], validateTitle),
               Divider(),
-              _CreateRow('Введите описание', _general_desc['decription'],
+              _CreateRow('Введите описание', _general_desc['content'],
                   validateContent, 5),
               Divider(),
               ListView.builder(
@@ -276,12 +281,13 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                 child: Text('Добавить ингредиент'),
                 onPressed: () async {
                   var inputs = await showMyDialog(context);
-                  if(inputs.length>0){
-                    Map<String,dynamic> map = new Map();
-                    map['name'] = inputs[0];
+                  if (inputs.length > 0) {
+                    Map<String, dynamic> map = new Map();
+                    map['ingredient'] = inputs[0];
+                    map['metric'] = inputs[1];
+                    map['count'] = inputs[2];
+
                     var ingredient = new Ingredients.fromJson(map);
-                    ingredient.count = inputs[2];
-                    ingredient.metric = inputs[1];
                     _recipeIngredient.add(ingredient);
                   }
                 },
@@ -444,10 +450,6 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                                             var image =
                                                 await ImagePicker.pickImage(
                                                     source: ImageSource.camera);
-                                            print("from camera" +
-                                                image.toString());
-                                            print("from camera" +
-                                                file.toString());
                                             _steps[index]['image'] =
                                                 image.toString();
                                             setState(() {
@@ -460,9 +462,7 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                                   ),
                                 );
                               });
-                          print('came');
-                          Future.delayed(Duration(milliseconds: 2000),
-                              () => _setImage(files, index));
+                          _setImage(files, index);
                         },
                       )
                     : Image.file(imagesFiles[index]),

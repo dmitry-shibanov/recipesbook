@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_storage/firebase_storage.dart';
 
 class Steps {
@@ -38,7 +40,7 @@ class Steps {
         FirebaseStorage.instance.ref().child(map['image']);
 
     Stream stream = Stream.fromFuture(ref.getDownloadURL());
-
+    StreamController controller = StreamController();
     stream.listen((data) {
       image = data;
     }, onDone: () {
