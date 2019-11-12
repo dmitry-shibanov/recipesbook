@@ -8,7 +8,8 @@ class Steps {
   String _pathImage;
 
   String get pathImage => _pathImage;
-
+  set pathImage(image) => _pathImage = image;
+  
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = new Map();
     map['content'] = content;
@@ -34,17 +35,17 @@ class Steps {
     content = map['content'];
 
     _pathImage = map['image'];
-    final StorageReference ref =
-        FirebaseStorage.instance.ref().child(map['image']);
+    // final StorageReference ref =
+    //     FirebaseStorage.instance.ref().child(map['image']);
 
-    Stream stream = Stream.fromFuture(ref.getDownloadURL());
+    // Stream stream = Stream.fromFuture(ref.getDownloadURL());
 
-    stream.listen((data) {
-      image = data;
-    }, onDone: () {
-      print("Task Done");
-    }, onError: (error) {
-      print("Some Error");
-    });
+    // stream.listen((data) {
+    //   image = data;
+    // }, onDone: () {
+    //   print("Task Done");
+    // }, onError: (error) {
+    //   print("Some Error");
+    // });
   }
 }

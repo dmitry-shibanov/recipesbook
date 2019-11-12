@@ -61,17 +61,17 @@ class Recipes extends WebData {
     content = map['content'];
     title = map['title'];
     _pathImage = map['image'];
-    final StorageReference ref =
-        FirebaseStorage.instance.ref().child(map['image']);
+    // final StorageReference ref =
+    //     FirebaseStorage.instance.ref().child(map['image']);
 
-    Stream stream = Stream.fromFuture(ref.getDownloadURL());
-    stream.listen((data) {
-      image = data;
-    }, onDone: () {
-      print("Task Done");
-    }, onError: (error) {
-      print("Some Error");
-    });
+    // Stream stream = Stream.fromFuture(ref.getDownloadURL());
+    // stream.listen((data) {
+    //   image = data;
+    // }, onDone: () {
+    //   print("Task Done");
+    // }, onError: (error) {
+    //   print("Some Error");
+    // });
 
     ingredients = (map['ingredients'] as List)
         .asMap()

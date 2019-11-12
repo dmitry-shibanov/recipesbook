@@ -33,6 +33,9 @@ class Api {
       var recipe = Recipes.fromJson(item.data);
       recipe.documentId = item.documentID;
       recipe.path = item.data['steps'].path;
+      final StorageReference ref =
+        FirebaseStorage.instance.ref().child(item.data['image']);
+      // recipe.image = (await ref.getDownloadURL());
       // recipe.steps = await Api.getSteps(item.data['steps'].path);
       recipes.add(recipe);
     });
@@ -74,7 +77,12 @@ class Api {
     for (int i = 0; i < content.length; i++) {
       Steps step = new Steps();
       step.content = content[i];
-      step.image = images[i];
+      step.pathImage = images[i];
+          final StorageReference ref =
+        FirebaseStorage.instance.ref().child(images[i]);
+      step.image = await ref.getDownloadURL();
+
+    // Stream stream = Stream.fromFuture(ref.getDownloadURL());
       steps.add(step);
     }
 
