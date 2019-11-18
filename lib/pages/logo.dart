@@ -1,9 +1,12 @@
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:recipesbook/data/db_helper.dart';
+import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/services/api.dart';
+import 'package:recipesbook/services/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class LogoPage extends StatelessWidget {
@@ -75,6 +78,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
           if (user == null || user.getIdToken() == null) {
             Navigator.pushReplacementNamed(context, '/auth');
           } else {
+            Provider.of(context).my_recipes = await Api.getRecipes();
             Navigator.pushReplacementNamed(context, '/main');
           }
         });

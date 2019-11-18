@@ -8,6 +8,7 @@ import 'package:recipesbook/components/ProductCart.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/pages/ReceiptDescription.dart';
 import 'package:recipesbook/services/api.dart';
+import 'package:recipesbook/services/provider.dart';
 
 class ProductsList extends StatefulWidget {
 
@@ -25,11 +26,17 @@ class ProductsListState extends State {
   @override
   void initState() {
     super.initState();
+    
     loadData();
   }
 
+// _isLoading
+//         ? Center(child: CircularProgressIndicator())
+//         :
+
+
   loadData() async {
-    recipes = await Api.getRecipes();
+    recipes = Provider.of(context).my_recipes;
     if (recipes.length > 0) {
       setState(() {
         _isLoading = false;
@@ -39,9 +46,9 @@ class ProductsListState extends State {
 
   @override
   Widget build(BuildContext context) {
-    return _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : TabBarView(
+        recipes = Provider.of(context).my_recipes;
+
+    return  TabBarView(
             // controller: _tabController,
             children: <Widget>[
               ListView.builder(
