@@ -1,52 +1,46 @@
-import 'dart:async';
-import 'dart:io';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/components/ProductCart.dart';
 import 'package:recipesbook/models/recipes.dart';
-import 'package:recipesbook/pages/ReceiptDescription.dart';
-import 'package:recipesbook/services/api.dart';
 import 'package:recipesbook/services/provider.dart';
 
 class ProductsList extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return ProductsListState();
   }
 }
 
 class ProductsListState extends State {
   // ProductsListState(this._tabController);
-  var _isLoading = true;
+  ScrollController _controllerCommon;
+  ScrollController _controllerLiked;
+
   List<Recipes> recipes = [];
   @override
   void initState() {
     super.initState();
-    
-    loadData();
+    _controllerCommon = ScrollController();
+    _controllerCommon.addListener(_scrollListController);
   }
 
-// _isLoading
-//         ? Center(child: CircularProgressIndicator())
-//         :
+  void _scrollListController(){
+      if(_controllerCommon.offset >= _controllerCommon.position.maxScrollExtent && !_controllerCommon.position.outOfRange){
+        setState(() {
+          // load data;
+        });
+      }
 
-
-  loadData() async {
-    recipes = Provider.of(context).my_recipes;
-    if (recipes.length > 0) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
+      if(_controllerCommon.offset <= _controllerCommon.position.minScrollExtent && !_controllerCommon.position.outOfRange){
+        setState(() {
+          // load data; reach top
+        });
+      }
   }
 
   @override
   Widget build(BuildContext context) {
-        recipes = Provider.of(context).my_recipes;
+    recipes = Provider.of(context).my_recipes;
 
     return  TabBarView(
             // controller: _tabController,

@@ -8,7 +8,9 @@ import 'package:recipesbook/services/api.dart';
 
 class ProductDescription extends StatefulWidget {
   Recipes recipe;
+  
   ProductDescription(this.recipe);
+
   final PageController Page_controller = PageController(initialPage: 0);
   var currentPageValue = 0.0;
   
