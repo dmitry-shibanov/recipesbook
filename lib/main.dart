@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:recipesbook/pages/CreateRecipes/create_recipe.dart';
-import 'package:recipesbook/pages/CreateRecipes/custom/camera.dart';
-import 'package:recipesbook/pages/CreateRecipes/custom/gallery.dart';
 import 'package:recipesbook/pages/ReceiptDescription.dart';
 import 'package:recipesbook/pages/auth/auth.dart';
 import 'package:recipesbook/pages/logo.dart';
 import 'package:recipesbook/pages/products.dart';
+import 'package:recipesbook/pages/savedRecipes/saved_resipes.dart';
 import 'package:recipesbook/pages/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/pages/user_profile.dart';
@@ -13,6 +12,8 @@ import 'package:recipesbook/services/api.dart';
 import 'package:recipesbook/services/provider.dart';
 
 import 'helpers/custom_route.dart';
+import 'models/recipes.dart';
+import 'models/steps.dart';
 
 void main() => runApp(MyApp());
 
@@ -36,7 +37,6 @@ class MyApp extends StatelessWidget {
           '/': (BuildContext context) => LogoPage(),
           '/auth': (BuildContext context) => AuthPage(),
           '/main': (BuildContext context) => MyHomePage(title: 'Recipes'),
-          '/settings': (BuildContext context) => SettingsPage(),
           '/out': (BuildContext context) => null,
           // '/saved': (BuildContext context) {
           //   final _db = new MyDatabase();
@@ -51,22 +51,20 @@ class MyApp extends StatelessWidget {
           //     });
           //   });
           // },
-          '/favorite': (BuildContext context) => null,
-          '/gallery': (BuildContext context) => Gallery(),
-          '/camera': (BuildContext context) => MyCamera()
+          '/favorite': (BuildContext context) => null
         },
-        // onGenerateRoute: (RouteSettings settings) {
-        //   final List<String> pathElements = settings.name.split('/');
-        //   if (pathElements[0] != '') {
-        //     return null;
-        //   }
-        //   if (pathElements[1] == 'product') {
-        //     final int index = int.parse(pathElements[2]);
-        //     return CustomRoute<bool>(
-        //         builder: (BuildContext context) => ProductDescription.fromDB(index));
-        //   }
-        //   return null;
-        // },
+        onGenerateRoute: (RouteSettings settings) {
+          final List<String> pathElements = settings.name.split('/');
+          if (pathElements[0] != '') {
+            return null;
+          }
+          if (pathElements[1] == 'product') {
+            final int index = int.parse(pathElements[2]);
+            return CustomRoute<bool>(
+                builder: (BuildContext context) => ProductDescription.fromDb(index));
+          }
+          return null;
+        },
       ),
     );
   }
@@ -122,8 +120,6 @@ class _MyHomePageState extends State<MyHomePage>
     });
   }
 
-  // https://medium.com/@lucassaltoncardinali/keeping-state-with-the-bottom-navigation-bar-in-flutter-69e4168878e1
-//https://stackoverflow.com/questions/49966980/how-to-create-toolbar-searchview-in-flutter
   Widget loadPage() {
     Widget widget = null;
     switch (_bottomIndex) {
@@ -238,7 +234,6 @@ class _MyHomePageState extends State<MyHomePage>
                 title: Text('Настройки'),
                 onTap: () async {
                   bool isOpened = await PermissionHandler().openAppSettings();
-                  // Navigator.pushNamed(context, '/settings');
                 },
               ),
               Divider(),

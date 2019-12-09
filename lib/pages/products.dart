@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:recipesbook/components/ProductCart.dart';
 import 'package:recipesbook/models/recipes.dart';
@@ -15,6 +17,7 @@ class ProductsListState extends State {
   // ProductsListState(this._tabController);
   ScrollController _controllerCommon;
   ScrollController _controllerLiked;
+  final StreamController _streamController = StreamController();
 
   List<Recipes> recipes = [];
   @override
@@ -26,9 +29,11 @@ class ProductsListState extends State {
 
   void _scrollListController(){
       if(_controllerCommon.offset >= _controllerCommon.position.maxScrollExtent && !_controllerCommon.position.outOfRange){
-        setState(() {
-          // load data;
-        });
+      //  setState(() {
+      //     // load data;
+      //   }); 
+      // _streamController.sink.addStream(stream)
+      // _streamController.sink.add()
       }
 
       if(_controllerCommon.offset <= _controllerCommon.position.minScrollExtent && !_controllerCommon.position.outOfRange){
@@ -41,11 +46,14 @@ class ProductsListState extends State {
   @override
   Widget build(BuildContext context) {
     recipes = Provider.of(context).my_recipes;
-
     return  TabBarView(
             // controller: _tabController,
             children: <Widget>[
+              // StreamBuilder(key: new Key("All recipes"),builder: (context,snapshot){
+
+              // },stream: ,)
               ListView.builder(
+                controller: _controllerCommon,
                 itemBuilder: (BuildContext context, int index) {
                   return GestureDetector(
                     child: ProductCard(recipes[index]),

@@ -79,7 +79,6 @@ create table $tableIngredients (
     recipe.image = results[0];
     String path = results[1];
     int id = await _db.insert(tableRecipes, recipe.toMapSave());
-    // saveFileInstance.saveImageNetwork(recipe.image,"p0");
     await _insertIngredients(recipe.ingredients, id);
     await _insertSteps(recipe.steps, path, id);
     return recipe;

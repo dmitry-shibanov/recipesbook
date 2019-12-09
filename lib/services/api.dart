@@ -5,7 +5,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,7 +12,6 @@ import 'package:recipesbook/models/Ingredients.dart';
 import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/models/steps.dart';
 
-// https://stackoverflow.com/questions/49241477/how-can-i-populate-the-reference-field-using-firestore
 enum AuthVariant { Anonymously, GoogleSingIn, EmailPassword, NotAuth }
 
 class Api {
@@ -26,12 +24,6 @@ class Api {
 
   static Future<List<Recipes>> getRecipes() async {
     List<Recipes> recipes = [];
-    // List<DocumentSnapshot> docs =
-    //     (await Firestore.instance.collection('recipes').getDocuments())
-    //         .documents;
-    // StreamBuilder builder = new StreamBuilder(
-    //   builder: ,
-    // );
 
     (await Firestore.instance.collection('recipes').getDocuments())
         .documents
@@ -94,8 +86,7 @@ class Api {
 
     return steps;
   }
-  // https://stackoverflow.com/questions/51857796/flutter-upload-image-to-firebase-storage
-//https://stackoverflow.com/questions/50877398/flutter-load-image-from-firebase-storage
+
   // static createRecipe(Recipes recipe) async {
   static createRecipe(String image) async {
     // Firestore.instance
@@ -110,7 +101,7 @@ class Api {
         contentType: "image" + '/' + "jpeg",
       ),
     );
-//https://firebasestorage.googleapis.com/v0/b/flutter-univer-work.appspot.com/o/doprot%2Fdjsakldals?alt=media&token=68809744-ac23-4a5d-b3a3-f315bc6bc9e3
+
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     print(downloadUrl.uploadSessionUri.path);
     print(downloadUrl.toString());

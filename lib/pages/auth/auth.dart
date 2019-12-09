@@ -1,11 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/mixins/validator_mixins.dart';
 import 'package:recipesbook/services/api.dart';
-import 'package:system_info/system_info.dart';
 
 enum AuthMode { SignUp, Login }
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/semantics.dart';
 import 'package:recipesbook/data/db_helper.dart';
 import 'dart:math' as math;
 
@@ -10,6 +9,10 @@ class ProductDescription extends StatefulWidget {
   Recipes recipe;
   
   ProductDescription(this.recipe);
+
+  ProductDescription.fromDb(int id){
+    var provider = new DatabaseProvider();
+  }
 
   final PageController Page_controller = PageController(initialPage: 0);
   var currentPageValue = 0.0;
@@ -31,8 +34,6 @@ class ProductDescriptionState extends State<ProductDescription>
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -88,13 +89,10 @@ class ProductDescriptionState extends State<ProductDescription>
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
             ),
             Container(
-              // flex: 1,
               height: MediaQuery.of(context).size.height / 2,
               child: PageView.builder(
-                // controller: controller,
                 itemBuilder: _stepReceipt,
                 itemCount: widget.recipe.steps.length,
-                // scrollDirection: Axis.horizontal,
               ),
             ),
             SizedBox(height: MediaQuery.of(context).size.height/12,)
@@ -181,34 +179,11 @@ class ProductDescriptionState extends State<ProductDescription>
     );
   }
 
-  // Widget buildIngredients() {
-  //   return Container(
-  //     margin: EdgeInsets.all(16.0),
-  //     child: Row(
-  //       children: <Widget>[
-  //         FittedBox(
-  //           child: Text(
-  //             'Гриль',
-  //             textAlign: TextAlign.start,
-  //           ),
-  //         ),
-  //         FittedBox(
-  //           child: Text(
-  //             '12 гр',
-  //             textAlign: TextAlign.end,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
     Widget _buildIngredients(BuildContext context, int index) {
     return Container(
       padding: EdgeInsets.all(8.0),
       child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
-      // key: Key(_recipeIngredient[index].id.toString()),
       children: <Widget>[
         Expanded(
           flex: 1,
@@ -228,7 +203,6 @@ class ProductDescriptionState extends State<ProductDescription>
       margin: EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         children: <Widget>[
-          // Image.asset('public/food.jpg'),
               FadeInImage(
                 image: NetworkImage(widget.recipe.steps[index].image),
                 placeholder: AssetImage('public/food.jpg'),

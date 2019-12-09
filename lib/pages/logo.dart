@@ -1,10 +1,8 @@
 import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:recipesbook/data/db_helper.dart';
-import 'package:recipesbook/models/recipes.dart';
 import 'package:recipesbook/services/api.dart';
 import 'package:recipesbook/services/provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -59,21 +57,12 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
       if (status == AnimationStatus.completed) {
         var future =
             new Future.delayed(const Duration(milliseconds: 1000), () async {
-          // Api.signOutAnon();
+
           DatabaseProvider provider = new DatabaseProvider();
-          var databasePath = await await getDatabasesPath();
+          var databasePath = await getDatabasesPath();
           String path = databasePath + "/demo.db";
           await provider.open(path);
-          // int ingredientsLength = (await provider.getIngredients()).length;
-          // List<Ingredients> ingredients = await Api.getIngredinets();
-          // List<Metrics> metrics = await Api.getMetrics();
-          // int metricsLength = (await provider.getIngredients()).length;
-          // if (ingredients.length>ingredientsLength) {
-          //   provider.insertIngredients(ingredients);
-          // }
-          // if (metrics.length<metricsLength){
-          //   provider.insertMetrics(metrics);
-          // }
+
           FirebaseUser user = await Api.currentUser;
           if (user == null || user.getIdToken() == null) {
             Navigator.pushReplacementNamed(context, '/auth');
@@ -82,15 +71,8 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
             Navigator.pushReplacementNamed(context, '/main');
           }
         });
-        // var subscription = future.asStream().listen(doStuffCallback);
-        // subscription.cancel();
 
       }
-      // if (status == AnimationStatus.completed) {
-      //   controller.reverse();
-      // } else if (status == AnimationStatus.dismissed) {
-      //   controller.forward();
-      // }
     });
     controllerPhrases.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -135,7 +117,6 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
             FadeTransition(
               opacity: animationPhrases,
               child: Container(
-                  // alignment: Alignment.bottomCenter,
                   child: Text(
                 data[_currentIndex],
                 style: TextStyle(

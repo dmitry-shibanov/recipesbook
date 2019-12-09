@@ -4,6 +4,14 @@ https://stackoverflow.com/questions/49455079/flutter-save-a-network-image-to-loc
 https://stackoverflow.com/questions/52299112/flutter-download-an-image-from-url
 https://pub.dev/packages/image_downloader#-readme-tab-
 https://medium.com/@ayushpguptaapg/using-streams-in-flutter-62fed41662e4
+https://stackoverflow.com/questions/51857796/flutter-upload-image-to-firebase-storage
+https://stackoverflow.com/questions/50877398/flutter-load-image-from-firebase-storage
+https://firebasestorage.googleapis.com/v0/b/flutter-univer-work.appspot.com/o/doprot%2Fdjsakldals?alt=media&token=68809744-ac23-4a5d-b3a3-f315bc6bc9e3
+https://medium.com/@lucassaltoncardinali/keeping-state-with-the-bottom-navigation-bar-in-flutter-69e4168878e1
+https://stackoverflow.com/questions/49966980/how-to-create-toolbar-searchview-in-flutter
+https://stackoverflow.com/questions/49241477/how-can-i-populate-the-reference-field-using-firestore
+
+
 final File image = await ImagePicker.pickImage(source: imageSource);
 
 // getting a directory path for saving

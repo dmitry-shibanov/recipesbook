@@ -37,23 +37,6 @@ class UserProfileState extends State<UserProfile> {
     );
   }
 
-  // Widget _buildPasswordTextField() {
-  //   return TextFormField(
-  //     keyboardType: TextInputType.text,
-  //     obscureText: true,
-  //     decoration: InputDecoration(
-  //         labelText: 'password', filled: true, fillColor: Colors.transparent),
-  //     validator: (String value) {
-  //       if (value.isEmpty || value.length < 10) {
-  //         return 'The password should be more than 10 characters';
-  //       }
-  //     },
-  //     onSaved: (String text) {
-  //       _password = text;
-  //     },
-  //   );
-  // }
-
   void submitForm() {
     if (!_globalKey.currentState.validate()) {
       return;
@@ -84,9 +67,6 @@ class UserProfileState extends State<UserProfile> {
                   var userUpdateInfo = new UserUpdateInfo();
                   userUpdateInfo.photoUrl = "dkaslkadls";
 
-                  // AuthCredential authcr = AuthCredential()
-                  
-                  // user.updatePhoneNumberCredential(credential)
                   user.updateProfile(userUpdateInfo);
                   
                   user.providerData.forEach((item){
@@ -130,22 +110,10 @@ class UserProfileState extends State<UserProfile> {
           child: Form(
             key: _globalKey,
             child: Container(
-              // width: targetWidth,
               child: Column(
                 children: <Widget>[
                   _buildEmailTextField(),
                   SizedBox(height: 10.0),
-                  // _buildPasswordTextField(),
-                  // SizedBox(height: 10.0),
-                  // SwitchListTile(
-                  //     secondary: Icon(Icons.mail_outline),
-                  //     title: Text('Оповещения'),
-                  //     value: _notifications,
-                  //     onChanged: (value) {
-                  //       setState(() {
-                  //         _notifications = value;
-                  //       });
-                  //     }),
                   SizedBox(height: 10.0),
                   FutureBuilder(
                     future: SharedPreferences.getInstance(),
