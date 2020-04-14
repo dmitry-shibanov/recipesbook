@@ -1,4 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase/firebase.dart';
+
 import 'package:flutter/material.dart';
 import 'package:recipesbook/services/api.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,21 +64,21 @@ class UserProfileState extends State<UserProfile> {
               FlatButton(
                 child: Text('Подтвердить'),
                 onPressed: () async {
-                  FirebaseUser user = await Api.currentUser;
+                  User user = await Api.currentUser;
                   print(user.uid);
                   var userUpdateInfo = new UserUpdateInfo();
                   userUpdateInfo.photoUrl = "dkaslkadls";
 
-                  user.updateProfile(userUpdateInfo);
+                  // user.updateProfile(userUpdateInfo)
                   
-                  user.providerData.forEach((item){
-                    print(item.displayName);
-                    print(item.email);
-                    print(item.phoneNumber);
-                    print(item.photoUrl);
-                    print(user.providerData.length);
+                  // user.providerData.forEach((item){
+                  //   print(item.displayName);
+                  //   print(item.email);
+                  //   print(item.phoneNumber);
+                  //   print(item.photoUrl);
+                  //   print(user.providerData.length);
 
-                  });
+                  // });
                   // await user.delete();
                   // Navigator.of(context).pushNamedAndRemoveUntil(
                   //     '/auth', (Route<dynamic> route) => false);

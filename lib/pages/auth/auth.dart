@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase/firebase.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:recipesbook/mixins/validator_mixins.dart';
@@ -33,7 +34,7 @@ class RegesrtationState extends State<Regestration>
   final PermissionHandler _permissionHandler = PermissionHandler();
   AnimationController _controller;
   AuthMode authVariant;
-  FirebaseUser _user;
+  User _user;
   Animation<Offset> _animation;
 
   void initState() {

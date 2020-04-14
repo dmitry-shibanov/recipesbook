@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:firebase/firebase.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -54,16 +55,18 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
     animationPhrases =
         CurvedAnimation(parent: controllerPhrases, curve: Curves.easeIn);
     animation.addStatusListener((status) async {
+              print("main listener");
       if (status == AnimationStatus.completed) {
+        print("completed");
         var future =
             new Future.delayed(const Duration(milliseconds: 1000), () async {
 
-          DatabaseProvider provider = new DatabaseProvider();
-          var databasePath = await getDatabasesPath();
-          String path = databasePath + "/demo.db";
-          await provider.open(path);
+          // DatabaseProvider provider = new DatabaseProvider();
+          // var databasePath = await getDatabasesPath();
+          // String path = databasePath + "/demo.db";
+          // await provider.open(path);
 
-          FirebaseUser user = await Api.currentUser;
+          User user = await Api.currentUser;
           if (user == null || user.getIdToken() == null) {
             Navigator.pushReplacementNamed(context, '/auth');
           } else {
@@ -76,6 +79,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
     });
     controllerPhrases.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
+        print("reverse");
         controllerPhrases.reverse();
       } else if (status == AnimationStatus.dismissed) {
         var random = Random();
@@ -83,6 +87,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
         setState(() {
           _currentIndex = random.nextInt(data.length);
         });
+        print("else reverse");
         controllerPhrases.forward();
       }
     });
@@ -108,7 +113,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
                 style: TextStyle(
                     fontFamily: 'DancingScript',
                     fontSize: 76.0,
-                    fontWeight: FontWeight.bold),
+                    fontWeight: FontWeight.bold, color: Colors.white),
               ),
             ),
             SizedBox(
@@ -120,7 +125,7 @@ class _LogoPageState extends State<LogoPageFull> with TickerProviderStateMixin {
                   child: Text(
                 data[_currentIndex],
                 style: TextStyle(
-                    fontFamily: 'Chilanka', fontWeight: FontWeight.bold),
+                    fontFamily: 'Chilanka', fontWeight: FontWeight.bold, color: Colors.white),
               )),
             )
           ],

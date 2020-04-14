@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:firebase/firebase.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info/device_info.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:device_info/device_info.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:recipesbook/models/Ingredients.dart';
@@ -15,12 +16,12 @@ import 'package:recipesbook/models/steps.dart';
 enum AuthVariant { Anonymously, GoogleSingIn, EmailPassword, NotAuth }
 
 class Api {
-  static FirebaseAuth _auth = FirebaseAuth.instance;
+  static Auth _auth = auth();
   static GoogleSignIn _googleSignIn = new GoogleSignIn();
 
-  FirebaseUser firebaseUser;
+  User firebaseUser;
 
-  static Future<FirebaseUser> get currentUser async => _auth.currentUser();
+  static Future<User> get currentUser async => _auth?.currentUser;
 
   static Future<List<Recipes>> getRecipes() async {
     List<Recipes> recipes = [];
@@ -31,7 +32,7 @@ class Api {
       var recipe = Recipes.fromJson(item.data);
       recipe.documentId = item.documentID;
       recipe.path = item.data['steps'].path;
-      final StorageReference ref =
+      final ref =
         FirebaseStorage.instance.ref().child(item.data['image']);
       recipe.image = await ref.getDownloadURL();
       // recipe.steps = await Api.getSteps(item.data['steps'].path);
@@ -39,26 +40,6 @@ class Api {
     });
 
     return recipes;
-  }
-
-// save cache images
-  Future<File> _saveToTemporaryDirectory(String name) async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    print(androidInfo.hardware);
-
-    final Directory temp = await getTemporaryDirectory();
-    final File imageFile = File('${temp.path}/images/someImageFile.png');
-
-    if (await imageFile.exists()) {
-      return imageFile;
-    } else {
-      // Image doesn't exist in cache
-      await imageFile.create(recursive: true);
-      // Download the image and write to above file
-    }
-
-    return null;
   }
 
   static Future<List<Steps>> getSteps(String path) async {
@@ -76,7 +57,7 @@ class Api {
       Steps step = new Steps();
       step.content = content[i];
       step.pathImage = images[i];
-          final StorageReference ref =
+          final ref =
         FirebaseStorage.instance.ref().child(images[i]);
       step.image = await ref.getDownloadURL();
 
@@ -92,7 +73,7 @@ class Api {
     // Firestore.instance
     //                 .collection("users").orderBy(field).where("ingredients",arrayContains: "ingredient")
 
-    final StorageReference storageRef =
+    final storageRef =
         FirebaseStorage.instance.ref().child("doprot/djsakldals");
 
     final StorageUploadTask uploadTask = storageRef.putFile(
@@ -123,12 +104,12 @@ class Api {
     // });
   }
 
-  static void signInAnon() async {
-    AuthResult result = await _auth.signInAnonymously();
-    print(result.toString());
-    FirebaseUser firebaseUser = result.user;
-    if (firebaseUser != null) {}
-  }
+  // static void signInAnon() async {
+  //   AuthResult result = await _auth.signInAnonymously();
+  //   print(result.toString());
+  //   FirebaseUser firebaseUser = result.user;
+  //   if (firebaseUser != null) {}
+  // }
 
   static Future<void> signOutAnon() async {
     _auth.signOut();
@@ -143,37 +124,41 @@ class Api {
     GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
+    final OAuthCredential credential = GoogleAuthProvider.credential(
+      googleAuth.idToken,googleAuth.accessToken
     );
 
-    final AuthResult authResult = await _auth.signInWithCredential(credential);
-    final FirebaseUser user = authResult.user;
+    final UserCredential authResult = await _auth.signInWithCredential(credential);
+    final User user = authResult.user;
 
-    final FirebaseUser currentUser = await _auth.currentUser();
+    final User currentUser = await _auth.currentUser;
     currentUser.delete();
   }
 
-  static Future<FirebaseUser> handleSignInEmail(
+  static Future<User> handleSignInEmail(
       String email, String password) async {
-    AuthResult result = await _auth.signInWithEmailAndPassword(
-        email: email, password: password);
-    final FirebaseUser user = result.user;
+         UserCredential result;
+        try{
+     result = await _auth.signInWithEmailAndPassword(
+        email,  password);
+        }catch(e){
+print('Error in sign in with credentials: $e');
+        }
+    final User user = result.user;
 
     if (user == null || await user.getIdToken() == null) {
       return null;
     }
 
-    final FirebaseUser currentUser = await _auth.currentUser();
+    final User currentUser = await _auth.currentUser;
 
     return user;
   }
 
-  static Future<FirebaseUser> handleSignUp(email, password) async {
-    AuthResult result = await _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
-    final FirebaseUser user = result.user;
+  static Future<User> handleSignUp(email, password) async {
+    UserCredential result = await _auth.createUserWithEmailAndPassword(
+         email,  password);
+    final user = result.user;
 
     if (user == null || await user.getIdToken() == null) {
       return null;
