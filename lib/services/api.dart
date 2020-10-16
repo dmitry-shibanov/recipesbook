@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:device_info/device_info.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 // import 'package:firebase_storage/firebase_storage.dart';
@@ -43,9 +42,6 @@ class Api {
 
 // save cache images
   Future<File> _saveToTemporaryDirectory(String name) async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    print(androidInfo.hardware);
 
     final Directory temp = await getTemporaryDirectory();
     final File imageFile = File('${temp.path}/images/someImageFile.png');
