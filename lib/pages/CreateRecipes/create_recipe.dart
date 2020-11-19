@@ -450,10 +450,14 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
                                             var image =
                                                 await ImagePicker.pickImage(
                                                     source: ImageSource.camera);
+                                                    if(image != null){
                                             _steps[index]['image'] =
                                                 image.toString();
+                                                    }
                                             setState(() {
-                                              file = new File(image.toString());
+                                              if(image != null){
+                                                file = new File(image.toString());
+                                              }
                                             });
                                           }
                                         },
@@ -508,7 +512,8 @@ class CreateReceiptState extends State<CreateReceipt> with CreateRecipeMixins {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Expanded(
-            child: Text(title),
+            child: Padding(child: Text(title),
+            padding: EdgeInsets.only(right: 2.0),),
             flex: 1,
           ),
           Expanded(

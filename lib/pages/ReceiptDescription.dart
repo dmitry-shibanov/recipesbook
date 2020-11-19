@@ -7,16 +7,15 @@ import 'package:recipesbook/services/api.dart';
 
 class ProductDescription extends StatefulWidget {
   Recipes recipe;
-  
+
   ProductDescription(this.recipe);
 
-  ProductDescription.fromDb(int id){
+  ProductDescription.fromDb(int id) {
     var provider = new DatabaseProvider();
   }
 
   final PageController Page_controller = PageController(initialPage: 0);
   var currentPageValue = 0.0;
-  
 
   @override
   State<StatefulWidget> createState() {
@@ -35,70 +34,83 @@ class ProductDescriptionState extends State<ProductDescription>
     super.initState();
   }
 
+  Widget subTitle(String title) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: Text(
+        title,
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: FutureBuilder(
         future: Api.getSteps(widget.recipe.path),
-        builder: (context,projectSnap){
-          if(!projectSnap.hasData){
+        builder: (context, projectSnap) {
+          if (!projectSnap.hasData) {
             return Center(child: CircularProgressIndicator());
-          }else{
+          } else {
             widget.recipe.steps = projectSnap.data;
             return CustomScrollView(slivers: <Widget>[
-        SliverAppBar(
-          expandedHeight: 256,
-          pinned: true,
-          flexibleSpace: FlexibleSpaceBar(
-            title: Text(widget.recipe.title,
-            overflow: TextOverflow.ellipsis,),
-            background: Hero(
-              tag: widget.recipe.documentId,
-              child: FadeInImage(
-                fit: BoxFit.cover,
-                placeholder: AssetImage('public/food.jpg'),
-                image: NetworkImage(widget.recipe.image),
+              SliverAppBar(
+                expandedHeight: 256,
+                pinned: true,
+                flexibleSpace: FlexibleSpaceBar(
+                  title: Text(
+                    widget.recipe.title,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  background: Hero(
+                    tag: widget.recipe.documentId,
+                    child: FadeInImage(
+                      fit: BoxFit.cover,
+                      placeholder: AssetImage('public/food.jpg'),
+                      image: NetworkImage(widget.recipe.image),
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
-        SliverList(
-          delegate: SliverChildListDelegate([
-            Text(
-              'Описание',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-            ),
-            Container(
-              margin: EdgeInsets.all(16.0),
-              child: Text(widget.recipe == null ?
-                  'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!':
-                  widget.recipe.content),
-            ),
-            Text(
-              'Ингедиенты',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-            ),
-            ListView.builder(
-              itemBuilder: _buildIngredients,
-              itemCount: widget.recipe.ingredients.length,
-              shrinkWrap: true,
-              controller: new ScrollController(keepScrollOffset: true),
-            ),
-            Text(
-              'Шаги',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height / 2,
-              child: PageView.builder(
-                itemBuilder: _stepReceipt,
-                itemCount: widget.recipe.steps.length,
-              ),
-            ),
-            SizedBox(height: MediaQuery.of(context).size.height/12,)
-          ]),
-        )
-      ]);
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  subTitle('Описание'),
+                  Container(
+                    margin: EdgeInsets.all(16.0),
+                    child: Text(widget.recipe == null
+                        ? 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!'
+                        : widget.recipe.content),
+                  ),
+                  subTitle('Ингедиенты'),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    child: ListView.builder(
+                    itemBuilder: _buildIngredients,
+                    physics: const NeverScrollableScrollPhysics(),
+                    primary: false,
+                    itemCount: widget.recipe.ingredients.length,
+                    shrinkWrap: true,
+                  ),),
+                  subTitle('Шаги'),
+                  // Text(
+                  //   'Шаги',
+                  //   style:
+                  //       TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0),
+                  // ),
+                  Container(
+                    height: MediaQuery.of(context).size.height / 2,
+                    child: PageView.builder(
+                      itemBuilder: _stepReceipt,
+                      itemCount: widget.recipe.steps.length,
+                    ),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 12,
+                  )
+                ]),
+              )
+            ]);
           }
         },
       ),
@@ -140,7 +152,7 @@ class ProductDescriptionState extends State<ProductDescription>
                   Icons.save,
                   color: Theme.of(context).primaryColor,
                 ),
-                onPressed: (){
+                onPressed: () {
                   DatabaseProvider provider = new DatabaseProvider();
                   provider.insert(widget.recipe);
                 },
@@ -179,22 +191,28 @@ class ProductDescriptionState extends State<ProductDescription>
     );
   }
 
-    Widget _buildIngredients(BuildContext context, int index) {
+  Widget _buildIngredients(BuildContext context, int index) {
     return Container(
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Expanded(
-          flex: 1,
-          child: Text("${widget.recipe.ingredients[index].count} ${widget.recipe.ingredients[index].metric}",textAlign: TextAlign.start,),
-        ),
-        Expanded(
-          flex: 2,
-          child: Text(widget.recipe.ingredients[index].title,textAlign: TextAlign.end,),
-        )
-      ],
-    ),
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: Text(
+              "${widget.recipe.ingredients[index].count} ${widget.recipe.ingredients[index].metric}",
+              textAlign: TextAlign.start,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              widget.recipe.ingredients[index].title,
+              textAlign: TextAlign.end,
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -203,16 +221,15 @@ class ProductDescriptionState extends State<ProductDescription>
       margin: EdgeInsets.symmetric(vertical: 16.0),
       child: Column(
         children: <Widget>[
-              FadeInImage(
-                image: NetworkImage(widget.recipe.steps[index].image),
-                placeholder: AssetImage('public/food.jpg'),
-              ),
+          FadeInImage(
+            image: NetworkImage(widget.recipe.steps[index].image),
+            placeholder: AssetImage('public/food.jpg'),
+          ),
           Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text(widget.recipe == null?
-              'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!':
-              widget.recipe.steps[index].content
-            ),
+            child: Text(widget.recipe == null
+                ? 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure officia hic blanditiis voluptates pariatur atque, id, in eos laudantium natus nihil obcaecati deleniti possimus voluptate, quia necessitatibus? Obcaecati, laboriosam ratione!'
+                : widget.recipe.steps[index].content),
           ),
         ],
       ),
